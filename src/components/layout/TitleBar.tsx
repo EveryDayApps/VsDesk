@@ -1,0 +1,61 @@
+import {
+    LayoutTemplate,
+    Maximize2,
+    Minimize2,
+    Search,
+    X
+} from 'lucide-react';
+
+interface TitleBarProps {
+  onSearchClick: () => void;
+}
+
+export function TitleBar({ onSearchClick }: TitleBarProps) {
+  return (
+    <div className="h-9 min-h-[2.25rem] w-full bg-vscode-activityBar flex items-center justify-between px-2 text-sm select-none border-b border-vscode-sidebar">
+      {/* Left Section: Menu + Nav */}
+      <div className="flex items-center space-x-3 w-1/3">
+        <div className="mr-2">
+          <img
+            src="/vite.svg" 
+            alt="Logo"
+            className="w-4 h-4"
+          />
+        </div>
+        <div className="hidden md:flex space-x-3 text-xs text-vscode-text">
+          <span className="hover:bg-vscode-list-hover px-1 rounded cursor-pointer transition-colors">File</span>
+          <span className="hover:bg-vscode-list-hover px-1 rounded cursor-pointer transition-colors">Edit</span>
+          <span className="hover:bg-vscode-list-hover px-1 rounded cursor-pointer transition-colors">Selection</span>
+          <span className="hover:bg-vscode-list-hover px-1 rounded cursor-pointer transition-colors">View</span>
+          <span className="hover:bg-vscode-list-hover px-1 rounded cursor-pointer transition-colors">Go</span>
+          <span className="hover:bg-vscode-list-hover px-1 rounded cursor-pointer transition-colors">Run</span>
+          <span className="hover:bg-vscode-list-hover px-1 rounded cursor-pointer transition-colors">Terminal</span>
+          <span className="hover:bg-vscode-list-hover px-1 rounded cursor-pointer transition-colors">Help</span>
+        </div>
+      </div>
+
+      {/* Center Section: Search / Command Palette Trigger */}
+      <div className="flex-1 flex justify-center max-w-xl">
+        <button
+          onClick={onSearchClick}
+          className="flex items-center justify-center space-x-2 bg-vscode-input hover:bg-vscode-hover border border-vscode-border rounded-md px-3 py-1 w-full max-w-md text-gray-400 transition-colors group"
+        >
+          <Search className="w-3.5 h-3.5 group-hover:text-vscode-text" />
+          <span className="text-xs truncate">vshome — browser-start</span>
+        </button>
+      </div>
+
+      {/* Right Section: Window Controls */}
+      <div className="flex items-center justify-end space-x-3 w-1/3">
+        <div className="flex space-x-2 mr-2">
+           <LayoutTemplate className="w-4 h-4 text-vscode-text hover:text-white cursor-pointer transition-colors" />
+        </div>
+        <div className="flex items-center space-x-4 pl-4 border-l border-vscode-sidebar">
+          <Minimize2 className="w-3 h-3 hover:text-white cursor-pointer transition-colors" />
+          <Maximize2 className="w-3 h-3 hover:text-white cursor-pointer transition-colors" />
+          <X className="w-3 h-3 hover:text-red-500 cursor-pointer transition-colors" />
+        </div>
+      </div>
+    </div>
+  );
+}
