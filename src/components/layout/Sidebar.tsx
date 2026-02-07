@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 import { cn } from '../../utils/cn';
+import { BookmarkSidebar } from '../bookmarks/BookmarkSidebar';
 
 interface SidebarProps {
   activeTab: string;
@@ -77,6 +78,10 @@ export function Sidebar({ activeTab }: SidebarProps) {
   const handleToggle = (id: string) => {
     setTreeStructure((prev) => toggleCollapse(id, prev));
   };
+
+  if (activeTab === 'bookmark') {
+    return <BookmarkSidebar />;
+  }
 
   if (activeTab !== 'explorer') {
     return (
