@@ -1,0 +1,6 @@
+- git branch should be diffrent workspace
+- export and import all configs
+- should support all existing themes of vs code
+- should have multiple widgets for home screen
+- file explorer should be bookmark manager
+- there should setting for configuring all things

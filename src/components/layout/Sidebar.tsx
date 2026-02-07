@@ -125,12 +125,14 @@ export function Sidebar({ activeTab }: SidebarProps) {
   };
 
   return (
-    <div className="w-64 bg-vscode-sidebar border-r border-gray-800 flex flex-col h-full overflow-y-auto custom-scrollbar pt-2">
+    <div className="w-64 bg-vscode-sidebar border-r border-gray-800 flex flex-col h-full pt-2">
       <div className="px-5 mb-2 flex items-center justify-between text-xs text-vscode-text uppercase tracking-wider font-semibold">
         <span>Explorer</span>
         <Layout className="w-4 h-4 cursor-pointer hover:text-white" />
       </div>
-      <div className="flex-1">{renderTree(treeStructure)}</div>
+      <vscode-scrollable className="flex-1">
+        {renderTree(treeStructure)}
+      </vscode-scrollable>
     </div>
   );
 }

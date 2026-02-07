@@ -9,14 +9,15 @@ export function Notes() {
         <h2 className="text-sm font-semibold uppercase tracking-wider text-vscode-text">
           Scratchpad
         </h2>
-        <span className="text-xs text-vscode-text opacity-50">Local Storage</span>
+        <vscode-badge>Local Storage</vscode-badge>
       </div>
-      <textarea
-        className="flex-1 w-full bg-vscode-bg p-4 resize-none focus:outline-none text-sm font-mono text-gray-300 leading-relaxed placeholder-gray-600"
+      <vscode-textarea
+        className="flex-1 w-full"
+        rows={20}
+        resize="vertical"
         placeholder="- Type your quick notes here...&#10;- They are saved automatically."
         value={notes}
-        onChange={(e) => setNotes(e.target.value)}
-        spellCheck={false}
+        onInput={(e: any) => setNotes(e.target.value)}
       />
     </div>
   );

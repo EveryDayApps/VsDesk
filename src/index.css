@@ -10,6 +10,32 @@
   color-scheme: dark;
   color: rgba(255, 255, 255, 0.87);
   background-color: #1e1e1e;
+
+  /* VSCode Elements CSS Variables */
+  --vscode-font-family: Inter, system-ui, sans-serif;
+  --vscode-font-size: 13px;
+  --vscode-foreground: #cccccc;
+  --vscode-focusBorder: #007acc;
+  --vscode-input-background: #3c3c3c;
+  --vscode-input-foreground: #cccccc;
+  --vscode-input-border: #3e3e42;
+  --vscode-inputOption-activeBorder: #007acc;
+  --vscode-button-background: #0e639c;
+  --vscode-button-foreground: #ffffff;
+  --vscode-button-hoverBackground: #1177bb;
+  --vscode-button-secondaryBackground: #3a3d41;
+  --vscode-button-secondaryForeground: #cccccc;
+  --vscode-button-secondaryHoverBackground: #45494e;
+  --vscode-checkbox-background: #3c3c3c;
+  --vscode-checkbox-border: #3e3e42;
+  --vscode-checkbox-foreground: #cccccc;
+  --vscode-badge-background: #4d4d4d;
+  --vscode-badge-foreground: #ffffff;
+  --vscode-list-hoverBackground: #2a2d2e;
+  --vscode-scrollbar-shadow: #000000;
+  --vscode-scrollbarSlider-background: rgba(121, 121, 121, 0.4);
+  --vscode-scrollbarSlider-hoverBackground: rgba(100, 100, 100, 0.7);
+  --vscode-scrollbarSlider-activeBackground: rgba(191, 191, 191, 0.4);
 }
 
 body {
@@ -27,3 +53,25 @@ body {
   padding: 0;
   text-align: left;
 }
+
+/* Custom styles for vscode-elements */
+vscode-textfield,
+vscode-textarea {
+  width: 100%;
+}
+
+vscode-button {
+  cursor: pointer;
+}
+
+vscode-scrollable {
+  display: block;
+  overflow-y: auto;
+}
+
+vscode-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+

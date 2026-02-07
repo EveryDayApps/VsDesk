@@ -27,7 +27,7 @@ interface CommandItem {
 export function CommandPalette({ isOpen, onClose, toggleTheme }: CommandPaletteProps) {
   const [query, setQuery] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<any>(null);
 
   const commands: CommandItem[] = [
     {
@@ -125,23 +125,20 @@ export function CommandPalette({ isOpen, onClose, toggleTheme }: CommandPaletteP
       >
         <div className="flex items-center px-4 py-3 border-b border-vscode-border bg-vscode-input">
           <Search className="w-5 h-5 text-gray-400 mr-3" />
-          <input
+          <vscode-textfield
             ref={inputRef}
-            type="text"
-            className="flex-1 bg-transparent border-none outline-none text-white placeholder-gray-500 text-lg"
+            className="flex-1"
             placeholder="Type a command or search..."
             value={query}
-            onChange={(e) => {
+            onInput={(e: any) => {
               setQuery(e.target.value);
               setSelectedIndex(0);
             }}
           />
-          <div className="text-xs text-vscode-text border border-vscode-border rounded px-1.5 py-0.5 ml-2">
-            ESC
-          </div>
+          <vscode-badge className="ml-2">ESC</vscode-badge>
         </div>
         
-        <div className="max-h-[60vh] overflow-y-auto py-2">
+        <vscode-scrollable className="max-h-[60vh] py-2">
           {filteredCommands.length === 0 ? (
              <div className="px-4 py-8 text-center text-gray-500">
                No commands found.
@@ -182,14 +179,12 @@ export function CommandPalette({ isOpen, onClose, toggleTheme }: CommandPaletteP
                   </div>
                 </div>
                 {command.shortcut && (
-                  <div className="text-xs text-gray-500 font-mono bg-vscode-bg px-1.5 py-0.5 rounded">
-                    {command.shortcut}
-                  </div>
+                  <vscode-badge>{command.shortcut}</vscode-badge>
                 )}
               </div>
             ))
           )}
-        </div>
+        </vscode-scrollable>
         
         <div className="bg-vscode-statusBar px-4 py-1.5 text-xs text-vscode-text flex justify-between border-t border-vscode-border">
             <span>ProTip: Use arrow keys to navigate</span>

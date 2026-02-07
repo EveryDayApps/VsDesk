@@ -36,13 +36,14 @@ export function TitleBar({ onSearchClick }: TitleBarProps) {
 
       {/* Center Section: Search / Command Palette Trigger */}
       <div className="flex-1 flex justify-center max-w-xl">
-        <button
+        <vscode-button
           onClick={onSearchClick}
-          className="flex items-center justify-center space-x-2 bg-vscode-input hover:bg-vscode-hover border border-vscode-border rounded-md px-3 py-1 w-full max-w-md text-gray-400 transition-colors group"
+          appearance="secondary"
+          className="flex items-center justify-center space-x-2 w-full max-w-md"
         >
-          <Search className="w-3.5 h-3.5 group-hover:text-vscode-text" />
+          <Search className="w-3.5 h-3.5" />
           <span className="text-xs truncate">vshome — browser-start</span>
-        </button>
+        </vscode-button>
       </div>
 
       {/* Right Section: Window Controls */}
