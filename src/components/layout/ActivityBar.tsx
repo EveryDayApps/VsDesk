@@ -12,6 +12,7 @@ import { cn } from '../../utils/cn';
 interface ActivityBarProps {
   activeTab: string;
   onTabChange: (tab: string) => void;
+  onSettingsClick: () => void;
 }
 
 const tabs = [
@@ -22,7 +23,7 @@ const tabs = [
   { id: 'extensions', icon: LayoutGrid, label: 'Extensions' },
 ];
 
-export function ActivityBar({ activeTab, onTabChange }: ActivityBarProps) {
+export function ActivityBar({ activeTab, onTabChange, onSettingsClick }: ActivityBarProps) {
   return (
     <div className="flex flex-col justify-between w-12 bg-vscode-activityBar border-r border-vscode-sidebar h-full text-vscode-text select-none z-20">
       <div className="flex flex-col items-center pt-2">
@@ -52,6 +53,7 @@ export function ActivityBar({ activeTab, onTabChange }: ActivityBarProps) {
           <User className="w-6 h-6 stroke-1" />
         </button>
         <button
+          onClick={onSettingsClick}
           className="group flex items-center justify-center w-12 h-12 text-vscode-text opacity-60 hover:text-white hover:opacity-100 transition-colors"
           title="Manage"
         >

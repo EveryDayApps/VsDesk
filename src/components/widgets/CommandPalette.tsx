@@ -13,6 +13,7 @@ interface CommandPaletteProps {
   isOpen: boolean;
   onClose: () => void;
   toggleTheme: () => void;
+  onOpenSettings: () => void;
 }
 
 interface CommandItem {
@@ -24,7 +25,7 @@ interface CommandItem {
   shortcut?: string;
 }
 
-export function CommandPalette({ isOpen, onClose, toggleTheme }: CommandPaletteProps) {
+export function CommandPalette({ isOpen, onClose, toggleTheme, onOpenSettings }: CommandPaletteProps) {
   const [query, setQuery] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
   const inputRef = useRef<any>(null);
@@ -51,7 +52,7 @@ export function CommandPalette({ isOpen, onClose, toggleTheme }: CommandPaletteP
       label: 'Open Settings',
       subLabel: 'Preferences: Open User Settings',
       icon: Settings,
-      action: () => alert('Settings opened! (Mock)'),
+      action: onOpenSettings,
       shortcut: '⌘,',
     },
     {
