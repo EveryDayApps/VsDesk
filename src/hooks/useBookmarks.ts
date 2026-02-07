@@ -3,7 +3,6 @@ import {
   type BookmarkRecord,
   bookmarkStore,
 } from '../db';
-
 export interface BookmarkItem {
   id: string;
   label: string;
@@ -12,7 +11,6 @@ export interface BookmarkItem {
   children?: BookmarkItem[];
   collapsed?: boolean;
 }
-
 const defaultBookmarks: BookmarkItem[] = [
   {
     id: 'root-1',
@@ -24,16 +22,12 @@ const defaultBookmarks: BookmarkItem[] = [
     ],
   },
 ];
-
 function generateId(): string {
   return `bk-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
 }
-
 // --- Flat ↔ Tree conversion utilities ---
-
 function buildTree(records: BookmarkRecord[]): BookmarkItem[] {
   const map = new Map<string | null, BookmarkRecord[]>();
-
   for (const record of records) {
     const parentId = record.parentId;
     if (!map.has(parentId)) {
@@ -41,16 +35,13 @@ function buildTree(records: BookmarkRecord[]): BookmarkItem[] {
     }
     map.get(parentId)!.push(record);
   }
-
   // Sort children within each group by sortOrder
   for (const children of map.values()) {
     children.sort((a, b) => a.sortOrder - b.sortOrder);
   }
-
   function buildChildren(parentId: string | null): BookmarkItem[] {
     const children = map.get(parentId);
     if (!children) return [];
-
     return children.map((record) => {
       const item: BookmarkItem = {
         id: record.id,
@@ -65,12 +56,11 @@ function buildTree(records: BookmarkRecord[]): BookmarkItem[] {
       return item;
     });
   }
-
   return buildChildren(null);
 }
-
 function flattenTree(
   items: BookmarkItem[],
+  workspaceId: string,
   parentId: string | null = null,
 ): BookmarkRecord[] {
   const records: BookmarkRecord[] = [];
@@ -81,18 +71,17 @@ function flattenTree(
       type: item.type,
       parentId,
       sortOrder: index,
+      workspaceId,
     };
     if (item.url) record.url = item.url;
     if (item.type === 'folder') record.collapsed = item.collapsed ?? false;
     records.push(record);
-
     if (item.children) {
-      records.push(...flattenTree(item.children, item.id));
+      records.push(...flattenTree(item.children, workspaceId, item.id));
     }
   });
   return records;
 }
-
 // Collect all descendant IDs of a record (for recursive delete)
 function collectDescendantIds(
   records: BookmarkRecord[],
@@ -107,10 +96,8 @@ function collectDescendantIds(
   }
   return ids;
 }
-
 // --- Hook ---
-
-export function useBookmarks() {
+export function useBookmarks(workspaceId: string = 'default') {
   const [bookmarks, setBookmarks] = useState<BookmarkItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const recordsRef = useRef<BookmarkRecord[]>([]);
@@ -119,12 +106,13 @@ export function useBookmarks() {
     async function init() {
       try {
         let records = await bookmarkStore.getAll();
+        // Filter by workspace - effectively implementing workspace isolation for bookmarks
+        records = records.filter(r => r.workspaceId === workspaceId || !r.workspaceId); // weak migration: include if missing
 
         if (records.length === 0) {
-          records = flattenTree(defaultBookmarks);
+          records = flattenTree(defaultBookmarks, workspaceId);
           await bookmarkStore.putMany(records);
         }
-
         recordsRef.current = records;
         setBookmarks(buildTree(records));
       } catch (err) {
@@ -135,28 +123,29 @@ export function useBookmarks() {
       }
     }
     init();
-  }, []);
+  }, [workspaceId]);
 
   const addItem = useCallback(
     (parentId: string | null, label: string, type: 'folder' | 'link', url?: string) => {
       const siblings = recordsRef.current.filter((r) => r.parentId === parentId);
       const sortOrder = siblings.length;
-
       const record: BookmarkRecord = {
         id: generateId(),
         label,
         type,
         parentId,
         sortOrder,
+        workspaceId,
       };
       if (type === 'link' && url) record.url = url;
       if (type === 'folder') record.collapsed = false;
 
-      recordsRef.current = [...recordsRef.current, record];
-      setBookmarks(buildTree(recordsRef.current));
+      const newRecords = [...recordsRef.current, record];
+      recordsRef.current = newRecords;
+      setBookmarks(buildTree(newRecords));
       bookmarkStore.put(record);
     },
-    [],
+    [workspaceId],
   );
 
   const removeItem = useCallback(
@@ -164,9 +153,9 @@ export function useBookmarks() {
       const descendantIds = collectDescendantIds(recordsRef.current, id);
       const allIdsToRemove = [id, ...descendantIds];
       const idSet = new Set(allIdsToRemove);
-
-      recordsRef.current = recordsRef.current.filter((r) => !idSet.has(r.id));
-      setBookmarks(buildTree(recordsRef.current));
+      const newRecords = recordsRef.current.filter((r) => !idSet.has(r.id));
+      recordsRef.current = newRecords;
+      setBookmarks(buildTree(newRecords));
       bookmarkStore.deleteMany(allIdsToRemove);
     },
     [],
@@ -174,15 +163,15 @@ export function useBookmarks() {
 
   const editItem = useCallback(
     (id: string, label: string, url?: string) => {
-      recordsRef.current = recordsRef.current.map((r) => {
+      const newRecords = recordsRef.current.map((r) => {
         if (r.id !== id) return r;
         const updated = { ...r, label };
         if (r.type === 'link') updated.url = url;
         return updated;
       });
-      setBookmarks(buildTree(recordsRef.current));
-
-      const record = recordsRef.current.find((r) => r.id === id);
+      recordsRef.current = newRecords;
+      setBookmarks(buildTree(newRecords));
+      const record = newRecords.find((r) => r.id === id);
       if (record) bookmarkStore.put(record);
     },
     [],
@@ -190,13 +179,13 @@ export function useBookmarks() {
 
   const toggleCollapse = useCallback(
     (id: string) => {
-      recordsRef.current = recordsRef.current.map((r) => {
+      const newRecords = recordsRef.current.map((r) => {
         if (r.id !== id) return r;
         return { ...r, collapsed: !r.collapsed };
       });
-      setBookmarks(buildTree(recordsRef.current));
-
-      const record = recordsRef.current.find((r) => r.id === id);
+      recordsRef.current = newRecords;
+      setBookmarks(buildTree(newRecords));
+      const record = newRecords.find((r) => r.id === id);
       if (record) bookmarkStore.put(record);
     },
     [],

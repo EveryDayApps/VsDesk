@@ -1,14 +1,19 @@
 import {
-  ChevronDown,
-  ChevronRight,
-  ExternalLink,
-  Folder,
-  FolderOpen,
-  Pencil,
-  Plus,
-  Trash2,
+    ChevronDown,
+    ChevronRight,
+    ExternalLink,
+    Folder,
+    FolderOpen,
+    Pencil,
+    Plus,
+    Trash2,
 } from 'lucide-react';
 import { useState } from 'react';
+import { useUser } from '../../context/UserContext';
+import { BookmarkItem, useBookmarks } from '../../hooks/useBookmarks';
+import { cn } from '../../utils/cn';
+import { AddBookmarkDialog } from './AddBookmarkDialog';
+import { EditBookmarkDialog } from './EditBookmarkDialog';
 
 function getFaviconUrl(url: string): string | null {
   try {
@@ -38,13 +43,10 @@ function Favicon({ url }: { url: string }) {
     />
   );
 }
-import { BookmarkItem, useBookmarks } from '../../hooks/useBookmarks';
-import { cn } from '../../utils/cn';
-import { AddBookmarkDialog } from './AddBookmarkDialog';
-import { EditBookmarkDialog } from './EditBookmarkDialog';
 
 export function BookmarkSidebar() {
-  const { bookmarks, addItem, editItem, removeItem, toggleCollapse } = useBookmarks();
+  const { activeWorkspaceId } = useUser();
+  const { bookmarks, addItem, editItem, removeItem, toggleCollapse } = useBookmarks(activeWorkspaceId || 'default');
   const [dialogParentId, setDialogParentId] = useState<string | null | undefined>(undefined);
   const [dialogParentName, setDialogParentName] = useState<string | null>(null);
   const [editingItem, setEditingItem] = useState<BookmarkItem | null>(null);

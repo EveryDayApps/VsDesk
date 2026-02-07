@@ -1,6 +1,6 @@
 import { WorkspaceDefinition } from '../types/workspace';
-import { homeWorkspace } from './homeWorkspace';
 import { bookmarkWorkspace } from './bookmarkWorkspace';
+import { homeWorkspace } from './homeWorkspace';
 import { settingsWorkspace } from './settingsWorkspace';
 
 export const workspaceRegistry: WorkspaceDefinition[] = [
@@ -8,3 +8,4 @@ export const workspaceRegistry: WorkspaceDefinition[] = [
   bookmarkWorkspace,
   settingsWorkspace,
 ];
+

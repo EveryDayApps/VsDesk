@@ -1,5 +1,4 @@
 import { Reorder } from 'framer-motion';
-import { User } from 'lucide-react';
 import { useMemo } from 'react';
 import { useWorkspace } from '../../context/WorkspaceContext';
 import { useLocalStorage } from '../../hooks/useLocalStorage';
@@ -31,7 +30,7 @@ export function ActivityBar({ activeWorkspaceId, onWorkspaceChange }: ActivityBa
   };
 
   return (
-    <div className="flex flex-col justify-between w-12 bg-vscode-activityBar border-r border-vscode-sidebar h-full text-vscode-text select-none z-20">
+    <div className="relative flex flex-col justify-between w-12 bg-vscode-activityBar border-r border-vscode-sidebar h-full text-vscode-text select-none z-20">
       <Reorder.Group
         axis="y"
         values={syncedOrder}
@@ -64,13 +63,7 @@ export function ActivityBar({ activeWorkspaceId, onWorkspaceChange }: ActivityBa
         })}
       </Reorder.Group>
 
-      <div className="flex flex-col items-center pb-2">
-        <button
-          className="group flex items-center justify-center w-12 h-12 text-vscode-text opacity-60 hover:text-white hover:opacity-100 transition-colors"
-          title="Accounts"
-        >
-          <User className="w-6 h-6 stroke-1" />
-        </button>
+      <div className="flex flex-col items-center pb-2 relative">
         {bottomWorkspaces.map((workspace) => {
           const Icon = workspace.icon;
           return (

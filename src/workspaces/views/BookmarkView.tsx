@@ -1,6 +1,7 @@
 import { Bookmark } from 'lucide-react';
-import { useBookmarks } from '../../hooks/useBookmarks';
+import { useUser } from '../../context/UserContext';
 import type { BookmarkItem } from '../../hooks/useBookmarks';
+import { useBookmarks } from '../../hooks/useBookmarks';
 
 function countItems(items: BookmarkItem[]): { links: number; folders: number } {
   let links = 0;
@@ -21,7 +22,8 @@ function countItems(items: BookmarkItem[]): { links: number; folders: number } {
 }
 
 export function BookmarkView() {
-  const { bookmarks, isLoading } = useBookmarks();
+  const { activeWorkspaceId } = useUser();
+  const { bookmarks, isLoading } = useBookmarks(activeWorkspaceId || 'default');
   const counts = countItems(bookmarks);
 
   if (isLoading) {
