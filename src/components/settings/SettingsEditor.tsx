@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { SettingsState, useSettings } from '../../context/SettingsContext';
 
 interface SettingsEditorProps {
-  onClose: () => void;
+  onClose?: () => void;
 }
 
 const SECTION_MAP: Record<string, { label: string; items: { key: keyof SettingsState; label: string; description: string }[] }> = {
@@ -94,13 +94,15 @@ export function SettingsEditor({ onClose }: SettingsEditorProps) {
             >
                 <RotateCcw size={16} />
             </button>
-            <button 
-                onClick={onClose}
-                className="p-1 hover:bg-[#3c3c3c] rounded text-[#cccccc]"
-                title="Close Settings"
-            >
-                <div className="text-xs uppercase font-bold tracking-wider">Close</div>
-            </button>
+            {onClose && (
+              <button
+                  onClick={onClose}
+                  className="p-1 hover:bg-[#3c3c3c] rounded text-[#cccccc]"
+                  title="Close Settings"
+              >
+                  <div className="text-xs uppercase font-bold tracking-wider">Close</div>
+              </button>
+            )}
         </div>
       </div>
 
