@@ -127,3 +127,37 @@ VsDesk aims to feel like **VS Code itself**, not a themed web app.
 
 Discipline > shortcuts.
 Consistency > creativity (unless explicitly allowed).
+
+---
+
+## 8. Architecture & Patterns
+
+* **Use Class-Based Logic** for services, data stores, and managers.
+* **Encapsulate logic** within classes rather than using loose standalone functions.
+
+### Guidelines:
+
+* **Stores/Services**:
+  * Create a class for the logic (e.g., `BookmarkStore`).
+  * Export a **singleton instance** for use throughout the app (e.g., `export const bookmarkStore = new BookmarkStore();`).
+  * Dependency Injection or Singleton patterns are preferred over functional closures for core services.
+
+* **Rationale**:
+  * Improves testability (easier to mock classes).
+  * Better organization of related methods.
+  * Clearer state management within the service/store.
+
+### Example:
+Instead of:
+```typescript
+export function getBookmarks() { ... }
+export function addBookmark() { ... }
+```
+Use:
+```typescript
+export class BookmarkStore {
+  getAll() { ... }
+  add() { ... }
+}
+export const bookmarkStore = new BookmarkStore();
+```

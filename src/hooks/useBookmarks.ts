@@ -1,10 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   type BookmarkRecord,
-  getAllBookmarks,
-  putBookmark,
-  putBookmarks,
-  deleteBookmarks,
+  bookmarkStore,
 } from '../db';
 
 export interface BookmarkItem {
@@ -121,11 +118,11 @@ export function useBookmarks() {
   useEffect(() => {
     async function init() {
       try {
-        let records = await getAllBookmarks();
+        let records = await bookmarkStore.getAll();
 
         if (records.length === 0) {
           records = flattenTree(defaultBookmarks);
-          await putBookmarks(records);
+          await bookmarkStore.putMany(records);
         }
 
         recordsRef.current = records;
@@ -157,7 +154,7 @@ export function useBookmarks() {
 
       recordsRef.current = [...recordsRef.current, record];
       setBookmarks(buildTree(recordsRef.current));
-      putBookmark(record);
+      bookmarkStore.put(record);
     },
     [],
   );
@@ -170,7 +167,7 @@ export function useBookmarks() {
 
       recordsRef.current = recordsRef.current.filter((r) => !idSet.has(r.id));
       setBookmarks(buildTree(recordsRef.current));
-      deleteBookmarks(allIdsToRemove);
+      bookmarkStore.deleteMany(allIdsToRemove);
     },
     [],
   );
@@ -186,7 +183,7 @@ export function useBookmarks() {
       setBookmarks(buildTree(recordsRef.current));
 
       const record = recordsRef.current.find((r) => r.id === id);
-      if (record) putBookmark(record);
+      if (record) bookmarkStore.put(record);
     },
     [],
   );
@@ -200,7 +197,7 @@ export function useBookmarks() {
       setBookmarks(buildTree(recordsRef.current));
 
       const record = recordsRef.current.find((r) => r.id === id);
-      if (record) putBookmark(record);
+      if (record) bookmarkStore.put(record);
     },
     [],
   );
