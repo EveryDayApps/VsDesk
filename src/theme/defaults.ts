@@ -44,6 +44,8 @@ export const DARK_DEFAULTS: Record<string, string> = {
   // Badge
   '--badge-bg': '#4d4d4d',
   '--badge-fg': '#ffffff',
+  '--activitybar-badge-bg': '#007acc',
+  '--activitybar-badge-fg': '#ffffff',
 
   // Layout foregrounds
   '--activitybar-fg': '#ffffff',
@@ -62,9 +64,9 @@ export const LIGHT_DEFAULTS: Record<string, string> = {
   // Layout
   '--app-bg': '#ffffff',
   '--sidebar-bg': '#f3f3f3',
-  '--activitybar-bg': '#2c2c2c',
+  '--activitybar-bg': '#e8e8e8',
   '--panel-bg': '#ffffff',
-  '--statusbar-bg': '#007acc',
+  '--statusbar-bg': '#f5f5f5',
   '--titlebar-bg': '#dddddd',
   '--widget-bg': '#f3f3f3',
   '--input-bg': '#ffffff',
@@ -99,11 +101,13 @@ export const LIGHT_DEFAULTS: Record<string, string> = {
   // Badge
   '--badge-bg': '#c4c4c4',
   '--badge-fg': '#333333',
+  '--activitybar-badge-bg': '#007acc',
+  '--activitybar-badge-fg': '#ffffff',
 
   // Layout foregrounds
-  '--activitybar-fg': '#ffffff',
+  '--activitybar-fg': '#424242',
   '--sidebar-fg': '#616161',
-  '--statusbar-fg': '#ffffff',
+  '--statusbar-fg': '#424242',
   '--titlebar-fg': '#333333',
 
   // Tabs

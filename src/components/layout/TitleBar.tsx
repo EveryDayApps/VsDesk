@@ -12,7 +12,7 @@ interface TitleBarProps {
 
 export function TitleBar({ onSearchClick }: TitleBarProps) {
   return (
-    <div className="h-9 min-h-[2.25rem] w-full bg-vscode-activityBar flex items-center justify-between px-2 text-sm select-none border-b border-vscode-sidebar">
+    <div className="h-9 min-h-[2.25rem] w-full flex items-center justify-between px-2 text-sm select-none border-b" style={{ backgroundColor: 'var(--titlebar-bg)', color: 'var(--titlebar-fg)', borderColor: 'var(--border-color)' }}>
       {/* Left Section: Menu + Nav */}
       <div className="flex items-center space-x-3 w-1/3">
         <div className="mr-2">

@@ -1,12 +1,12 @@
 import {
-  ChevronDown,
-  ChevronRight,
-  Clock,
-  ExternalLink,
-  FileText,
-  Folder,
-  Layout,
-  Pin,
+    ChevronDown,
+    ChevronRight,
+    Clock,
+    ExternalLink,
+    FileText,
+    Folder,
+    Layout,
+    Pin,
 } from 'lucide-react';
 import { useState } from 'react';
 import { cn } from '../../utils/cn';
@@ -85,7 +85,7 @@ export function ExplorerSidebar() {
               'flex items-center px-4 py-1 cursor-pointer select-none transition-colors overflow-hidden truncate',
               isHeader
                 ? 'font-bold text-xs text-vscode-text tracking-wide mt-2 hover:text-white'
-                : 'text-sm text-gray-400 hover:bg-vscode-list-hover hover:text-white',
+                : 'text-sm text-vscode-text-secondary hover:bg-vscode-list-hover hover:text-white',
               !isHeader && 'ml-2'
             )}
             style={{ paddingLeft: `${depth * 12 + (isHeader ? 16 : 8)}px` }}
@@ -112,7 +112,7 @@ export function ExplorerSidebar() {
   };
 
   return (
-    <div className="w-64 bg-vscode-sidebar border-r border-gray-800 flex flex-col h-full pt-2">
+    <div className="w-64 bg-vscode-sidebar border-r border-vscode-border flex flex-col h-full pt-2">
       <div className="px-5 mb-2 flex items-center justify-between text-xs text-vscode-text uppercase tracking-wider font-semibold">
         <span>Explorer</span>
         <Layout className="w-4 h-4 cursor-pointer hover:text-white" />

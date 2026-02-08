@@ -30,7 +30,7 @@ export function ActivityBar({ activeWorkspaceId, onWorkspaceChange }: ActivityBa
   };
 
   return (
-    <div className="relative flex flex-col justify-between w-12 bg-vscode-activityBar border-r border-vscode-sidebar h-full text-vscode-text select-none z-20">
+    <div className="relative flex flex-col justify-between w-12 border-r h-full select-none z-20" style={{ backgroundColor: 'var(--activitybar-bg)', borderColor: 'var(--border-color)', color: 'var(--activitybar-fg)' }}>
       <Reorder.Group
         axis="y"
         values={syncedOrder}
@@ -49,7 +49,7 @@ export function ActivityBar({ activeWorkspaceId, onWorkspaceChange }: ActivityBa
               whileDrag={{ scale: 1.1, opacity: 0.8 }}
               className={cn(
                 'group relative flex items-center justify-center w-12 h-12 transition-colors hover:text-white cursor-grab active:cursor-grabbing',
-                activeWorkspaceId === workspaceId ? 'text-[var(--activitybar-fg)]' : 'text-vscode-text opacity-60 hover:opacity-100'
+                activeWorkspaceId === workspaceId ? 'opacity-100' : 'opacity-60 hover:opacity-100'
               )}
               title={workspace.title}
               onClick={() => onWorkspaceChange(workspaceId)}
@@ -74,7 +74,7 @@ export function ActivityBar({ activeWorkspaceId, onWorkspaceChange }: ActivityBa
                 'group flex items-center justify-center w-12 h-12 transition-colors',
                 activeWorkspaceId === workspace.id
                   ? 'text-[var(--activitybar-fg)]'
-                  : 'text-vscode-text opacity-60 hover:text-[var(--activitybar-fg)] hover:opacity-100'
+                  : 'opacity-60 hover:opacity-100'
               )}
               title={workspace.title}
             >

@@ -74,8 +74,8 @@ export function TodoList() {
               />
               <span
                 className={cn(
-                  "flex-1 text-sm text-gray-300 truncate",
-                  todo.completed && "line-through text-gray-500"
+                  "flex-1 text-sm text-vscode-text truncate",
+                  todo.completed && "line-through text-vscode-text-muted"
                 )}
               >
                 {todo.text}

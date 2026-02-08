@@ -44,7 +44,7 @@ function App() {
   const showSidebar = settings.showSidebar && isSidebarOpen && activeWorkspace.sidebarConfig?.enabled;
 
   return (
-    <div className="flex flex-col h-screen overflow-hidden bg-vscode-bg text-[var(--text-heading)] font-sans">
+    <div className="flex flex-col h-screen overflow-hidden font-sans" style={{ backgroundColor: 'var(--app-bg)', color: 'var(--text-heading)' }}>
       {settings.showTitleBar && <TitleBar onSearchClick={() => setShowCommandPalette(true)} />}
 
       <div className="flex flex-1 overflow-hidden relative">
@@ -59,7 +59,7 @@ function App() {
           <Sidebar workspace={activeWorkspace} />
         )}
 
-        <main className="flex-1 overflow-hidden relative bg-vscode-bg">
+        <main className="flex-1 overflow-hidden relative" style={{ backgroundColor: 'var(--app-bg)' }}>
           <ActiveComponent />
         </main>
       </div>

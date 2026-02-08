@@ -49,6 +49,8 @@ export const APP_TOKEN_MAP: Record<string, string> = {
   // Badge
   'badge.background': '--badge-bg',
   'badge.foreground': '--badge-fg',
+  'activityBarBadge.background': '--activitybar-badge-bg',
+  'activityBarBadge.foreground': '--activitybar-badge-fg',
 
   // Tabs
   'tab.activeBackground': '--tab-active-bg',

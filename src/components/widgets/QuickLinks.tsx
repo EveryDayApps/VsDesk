@@ -21,7 +21,7 @@ export function QuickLinks() {
           <div className={`p-3 rounded-full bg-vscode-bg group-hover:bg-vscode-activityBar transition-colors ${link.color}`}>
             <link.icon className="w-8 h-8" />
           </div>
-          <span className="mt-3 text-sm font-medium text-gray-300 group-hover:text-white transition-colors">
+          <span className="mt-3 text-sm font-medium text-vscode-text-secondary group-hover:text-white transition-colors">
             {link.name}
           </span>
         </a>
