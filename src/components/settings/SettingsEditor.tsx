@@ -1,16 +1,27 @@
-import { Download, Filter, LogOut, Pencil, Plus, RotateCcw, Search, Trash2, Upload } from 'lucide-react';
+import {
+  Download,
+  Filter,
+  Layout,
+  LogOut,
+  RotateCcw,
+  Search,
+  Settings,
+  Upload,
+  User,
+  Zap
+} from 'lucide-react';
 import { useState } from 'react';
 import { SettingsState, useSettings } from '../../context/SettingsContext';
 import { useUser } from '../../context/UserContext';
-import { cn } from '../../utils/cn';
 
 interface SettingsEditorProps {
   onClose?: () => void;
 }
 
-const SECTION_MAP: Record<string, { label: string; items: { key: keyof SettingsState; label: string; description: string }[] }> = {
+const SECTION_MAP: Record<string, { label: string; icon: React.ElementType; items: { key: keyof SettingsState; label: string; description: string }[] }> = {
   'Commonly Used': {
     label: 'Commonly Used',
+    icon: Settings,
     items: [
       { key: 'showSidebar', label: 'Sidebar: Visible', description: 'Controls the visibility of the primary sidebar.' },
       { key: 'showActivityBar', label: 'Activity Bar: Visible', description: 'Controls the visibility of the activity bar.' },
@@ -19,10 +30,12 @@ const SECTION_MAP: Record<string, { label: string; items: { key: keyof SettingsS
   },
   'User': {
     label: 'User',
+    icon: User,
     items: []
   },
   'Workbench': {
     label: 'Workbench',
+    icon: Layout,
     items: [
       { key: 'showTitleBar', label: 'Title Bar: Visible', description: 'Controls the visibility of the window title bar.' },
       { key: 'showStatusBar', label: 'Status Bar: Visible', description: 'Controls the visibility of the status bar at the bottom of the window.' },
@@ -32,6 +45,7 @@ const SECTION_MAP: Record<string, { label: string; items: { key: keyof SettingsS
   },
   'Features': {
     label: 'Features',
+    icon: Zap,
     items: [
       { key: 'showClock', label: 'Widgets: Clock', description: 'Show the clock widget on the dashboard.' },
       { key: 'showGoogleSearch', label: 'Widgets: Google Search', description: 'Show the search widget on the dashboard.' },
@@ -46,14 +60,10 @@ export function SettingsEditor({ onClose }: SettingsEditorProps) {
   const { settings, updateSetting, resetSettings } = useSettings();
   const { 
     profile, 
-    workspaces, 
-    activeWorkspaceId, 
-    setActiveWorkspace,
-    createWorkspace,
     updateProfile,
     resetUser,
     exportData,
-    importData
+    importData,
   } = useUser();
   
   const [activeCategory, setActiveCategory] = useState<string>('Commonly Used');
@@ -66,8 +76,7 @@ export function SettingsEditor({ onClose }: SettingsEditorProps) {
   const [isSaving, setIsSaving] = useState(false);
   
   // Workspace editing state
-  const [editingWorkspaceId, setEditingWorkspaceId] = useState<string | null>(null);
-  const [editingWorkspaceName, setEditingWorkspaceName] = useState('');
+
 
   // Handler functions
   const handleSaveProfile = async () => {
@@ -87,22 +96,7 @@ export function SettingsEditor({ onClose }: SettingsEditorProps) {
     }
   };
 
-  const handleCreateWorkspace = async () => {
-    const name = prompt('Enter workspace name:');
-    if (name?.trim()) {
-      await createWorkspace(name.trim());
-    }
-  };
 
-  const handleEditWorkspace = (workspaceId: string, currentName: string) => {
-    setEditingWorkspaceId(workspaceId);
-    setEditingWorkspaceName(currentName);
-  };
-
-  const handleSaveWorkspaceName = async () => {
-    setEditingWorkspaceId(null);
-    setEditingWorkspaceName('');
-  };
 
   const handleReset = async () => {
     if (confirm('Are you sure you want to reset all data? This cannot be undone.')) {
@@ -218,20 +212,24 @@ export function SettingsEditor({ onClose }: SettingsEditorProps) {
         {!searchQuery && (
             <div className="w-48 bg-[#252526] border-r border-[#2b2b2b] overflow-y-auto">
             <div className="py-2">
-                {Object.keys(SECTION_MAP).map((category) => (
-                <div
-                    key={category}
-                    className={`px-4 py-1.5 cursor-pointer text-sm flex items-center ${
-                    activeCategory === category 
-                        ? 'bg-[#37373d] text-white' 
-                        : 'text-[#969696] hover:bg-[#2a2d2e] hover:text-[#cccccc]'
-                    }`}
-                    onClick={() => setActiveCategory(category)}
-                >
-                    {activeCategory === category && <div className="w-0.5 h-4 bg-white absolute left-0" />}
-                    {category}
-                </div>
-                ))}
+                {Object.entries(SECTION_MAP).map(([category, section]) => {
+                  const Icon = section.icon;
+                  return (
+                    <div
+                        key={category}
+                        className={`px-4 py-1.5 cursor-pointer text-sm flex items-center gap-2 ${
+                        activeCategory === category 
+                            ? 'bg-[#37373d] text-white' 
+                            : 'text-[#969696] hover:bg-[#2a2d2e] hover:text-[#cccccc]'
+                        }`}
+                        onClick={() => setActiveCategory(category)}
+                    >
+                        {activeCategory === category && <div className="w-0.5 h-4 bg-white absolute left-0" />}
+                        <Icon size={16} />
+                        <span>{category}</span>
+                    </div>
+                  );
+                })}
             </div>
             </div>
         )}
@@ -343,92 +341,7 @@ export function SettingsEditor({ onClose }: SettingsEditorProps) {
                 </section>
 
                 {/* Workspaces Section */}
-                <section>
-                  <h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                    <div className="w-1 h-5 bg-[#007fd4]" />
-                    Workspaces
-                  </h2>
 
-                  <div className="bg-[#252526] border border-[#2b2b2b] rounded-sm overflow-hidden">
-                    <div className="divide-y divide-[#2b2b2b]">
-                      {workspaces.map((workspace: import('../../db').WorkspaceRecord) => (
-                        <div
-                          key={workspace.id}
-                          className={cn(
-                            "flex items-center gap-3 p-4 hover:bg-[#2a2d2e] transition-colors",
-                            activeWorkspaceId === workspace.id && "bg-[#37373d]"
-                          )}
-                        >
-                          <div className="flex-1">
-                            {editingWorkspaceId === workspace.id ? (
-                              <input
-                                type="text"
-                                value={editingWorkspaceName}
-                                onChange={(e) => setEditingWorkspaceName(e.target.value)}
-                                onBlur={() => handleSaveWorkspaceName()}
-                                onKeyDown={(e) => {
-                                  if (e.key === 'Enter') handleSaveWorkspaceName();
-                                  if (e.key === 'Escape') setEditingWorkspaceId(null);
-                                }}
-                                className="w-full bg-[#3c3c3c] border border-[#007fd4] text-sm text-[#cccccc] px-2 py-1 outline-none rounded-sm"
-                                autoFocus
-                              />
-                            ) : (
-                              <div className="flex items-center gap-2">
-                                <span className="text-sm font-medium text-[#e7e7e7]">
-                                  {workspace.name}
-                                </span>
-                                {activeWorkspaceId === workspace.id && (
-                                  <span className="text-xs bg-[#007fd4] text-white px-2 py-0.5 rounded-sm">
-                                    Active
-                                  </span>
-                                )}
-                              </div>
-                            )}
-                            <div className="text-xs text-[#858585] mt-1">
-                              Created {new Date(workspace.createdAt).toLocaleDateString()}
-                            </div>
-                          </div>
-
-                          <div className="flex items-center gap-1">
-                            {activeWorkspaceId !== workspace.id && (
-                              <button
-                                onClick={() => setActiveWorkspace(workspace.id)}
-                                className="px-3 py-1.5 text-xs bg-[#3c3c3c] hover:bg-[#454545] text-[#cccccc] rounded-sm transition-colors"
-                              >
-                                Switch
-                              </button>
-                            )}
-                            <button
-                              onClick={() => handleEditWorkspace(workspace.id, workspace.name)}
-                              className="p-1.5 hover:bg-[#454545] text-[#cccccc] rounded-sm transition-colors"
-                              title="Rename workspace"
-                            >
-                              <Pencil className="w-4 h-4" />
-                            </button>
-                            {workspaces.length > 1 && (
-                              <button
-                                className="p-1.5 hover:bg-[#5a1d1d] text-red-400 rounded-sm transition-colors"
-                                title="Delete workspace"
-                              >
-                                <Trash2 className="w-4 h-4" />
-                              </button>
-                            )}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-
-                    {/* Add Workspace Button */}
-                    <button
-                      onClick={handleCreateWorkspace}
-                      className="w-full p-4 flex items-center gap-2 text-sm text-[#cccccc] hover:bg-[#2a2d2e] transition-colors border-t border-[#2b2b2b]"
-                    >
-                      <Plus className="w-4 h-4" />
-                      <span>New Workspace</span>
-                    </button>
-                  </div>
-                </section>
 
                 {/* Data Management Section */}
                 <section>

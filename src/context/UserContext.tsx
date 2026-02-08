@@ -1,11 +1,11 @@
 import { ReactNode, createContext, useContext, useEffect, useState } from 'react';
 import {
-    ProfileRecord,
-    UserRecord,
-    WorkspaceRecord,
-    profileStore,
-    userStore,
-    workspaceStore
+  ProfileRecord,
+  UserRecord,
+  WorkspaceRecord,
+  profileStore,
+  userStore,
+  workspaceStore
 } from '../db';
 
 interface UserContextType {
@@ -20,6 +20,8 @@ interface UserContextType {
   resetUser: () => Promise<void>;
   exportData: () => Promise<string>;
   importData: (jsonString: string) => Promise<void>;
+  editWorkspace: (id: string, name: string) => Promise<void>;
+  deleteWorkspace: (id: string) => Promise<void>;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -153,6 +155,36 @@ export function UserProvider({ children }: { children: ReactNode }) {
     setProfile(updatedProfile);
   };
 
+  const editWorkspace = async (id: string, name: string) => {
+    if (!user) return;
+    
+    const workspace = workspaces.find(w => w.id === id);
+    if (!workspace) return;
+
+    if (workspace.name === name) return;
+
+    const updatedWorkspace = { ...workspace, name };
+    await workspaceStore.save(updatedWorkspace);
+    setWorkspaces(prev => prev.map(w => w.id === id ? updatedWorkspace : w));
+  };
+
+  const deleteWorkspace = async (id: string) => {
+    if (!user) return;
+    
+    // Prevent deleting the last workspace
+    if (workspaces.length <= 1) {
+      throw new Error('Cannot delete the last workspace');
+    }
+
+    // Prevent deleting the active workspace
+    if (id === activeWorkspaceId) {
+      throw new Error('Cannot delete the active workspace');
+    }
+
+    await workspaceStore.delete(id);
+    setWorkspaces(prev => prev.filter(w => w.id !== id));
+  };
+
   const resetUser = async () => {
       if (user) {
         await userStore.save({ ...user, onboardingCompleted: false });
@@ -237,7 +269,9 @@ export function UserProvider({ children }: { children: ReactNode }) {
         updateProfile,
         resetUser,
         exportData,
-        importData
+        importData,
+        editWorkspace,
+        deleteWorkspace
       }}
     >
       {children}

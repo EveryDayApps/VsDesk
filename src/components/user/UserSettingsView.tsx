@@ -10,7 +10,9 @@ export function UserSettingsView() {
     activeWorkspaceId, 
     setActiveWorkspace,
     createWorkspace,
-    updateProfile 
+    updateProfile,
+    editWorkspace,
+    deleteWorkspace
   } = useUser();
 
   const [displayName, setDisplayName] = useState(profile?.displayName || 'User');
@@ -40,7 +42,12 @@ export function UserSettingsView() {
   const handleCreateWorkspace = async () => {
     const name = prompt('Enter workspace name:');
     if (name?.trim()) {
-      await createWorkspace(name.trim());
+      try {
+        await createWorkspace(name.trim());
+      } catch (error) {
+        console.error('Failed to create workspace:', error);
+        alert('Failed to create workspace');
+      }
     }
   };
 
@@ -50,10 +57,32 @@ export function UserSettingsView() {
   };
 
   const handleSaveWorkspaceName = async () => {
-    // Note: We need to add updateWorkspace to UserContext
-    // For now, just close the edit mode
-    setEditingWorkspaceId(null);
-    setEditingWorkspaceName('');
+    if (!editingWorkspaceId || !editingWorkspaceName.trim()) {
+      setEditingWorkspaceId(null);
+      setEditingWorkspaceName('');
+      return;
+    }
+
+    try {
+      await editWorkspace(editingWorkspaceId, editingWorkspaceName.trim());
+    } catch (error) {
+      console.error('Failed to update workspace:', error);
+      alert('Failed to update workspace');
+    } finally {
+      setEditingWorkspaceId(null);
+      setEditingWorkspaceName('');
+    }
+  };
+
+  const handleDeleteWorkspace = async (workspaceId: string) => {
+    if (confirm('Are you sure you want to delete this workspace?')) {
+      try {
+        await deleteWorkspace(workspaceId);
+      } catch (error) {
+        console.error('Failed to delete workspace:', error);
+        alert(error instanceof Error ? error.message : 'Failed to delete workspace');
+      }
+    }
   };
 
   return (
@@ -173,7 +202,7 @@ export function UserSettingsView() {
                 <div
                   key={workspace.id}
                   className={cn(
-                    "flex items-center gap-3 p-4 hover:bg-[#2a2d2e] transition-colors",
+                    "flex items-center gap-3 p-4 hover:bg-[#2a2d2e] transition-colors group",
                     activeWorkspaceId === workspace.id && "bg-[#37373d]"
                   )}
                 >
@@ -219,14 +248,15 @@ export function UserSettingsView() {
                     )}
                     <button
                       onClick={() => handleEditWorkspace(workspace.id, workspace.name)}
-                      className="p-1.5 hover:bg-[#454545] text-[#cccccc] rounded-sm transition-colors"
+                      className="p-1.5 hover:bg-[#454545] text-[#cccccc] rounded-sm transition-colors opacity-0 group-hover:opacity-100"
                       title="Rename workspace"
                     >
                       <Pencil className="w-4 h-4" />
                     </button>
-                    {workspaces.length > 1 && (
+                    {workspaces.length > 1 && workspace.id !== activeWorkspaceId && (
                       <button
-                        className="p-1.5 hover:bg-[#5a1d1d] text-red-400 rounded-sm transition-colors"
+                        onClick={() => handleDeleteWorkspace(workspace.id)}
+                        className="p-1.5 hover:bg-[#5a1d1d] text-red-400 rounded-sm transition-colors opacity-0 group-hover:opacity-100"
                         title="Delete workspace"
                       >
                         <Trash2 className="w-4 h-4" />

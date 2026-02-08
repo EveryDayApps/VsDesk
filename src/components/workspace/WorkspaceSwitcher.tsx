@@ -1,7 +1,7 @@
 import { Check, Edit2, Plus, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { useUser } from '../../context/UserContext';
-import { workspaceStore } from '../../db';
+import { WorkspaceRecord } from '../../db';
 import { Overlay } from '../ui/Overlay';
 
 interface WorkspaceSwitcherProps {
@@ -10,7 +10,7 @@ interface WorkspaceSwitcherProps {
 }
 
 export function WorkspaceSwitcher({ isOpen, onClose }: WorkspaceSwitcherProps) {
-  const { workspaces, activeWorkspaceId, setActiveWorkspace, createWorkspace } = useUser();
+  const { workspaces, activeWorkspaceId, setActiveWorkspace, createWorkspace, editWorkspace, deleteWorkspace } = useUser();
   const [newWorkspaceName, setNewWorkspaceName] = useState('');
   const [isCreating, setIsCreating] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -47,12 +47,16 @@ export function WorkspaceSwitcher({ isOpen, onClose }: WorkspaceSwitcherProps) {
     }
 
     if (confirm('Are you sure you want to delete this workspace?')) {
-      await workspaceStore.delete(workspaceId);
-      window.location.reload(); // Reload to refresh the workspace list
+      try {
+        await deleteWorkspace(workspaceId);
+      } catch (error) {
+        console.error('Failed to delete workspace:', error);
+        alert('Failed to delete workspace');
+      }
     }
   };
 
-  const handleStartEdit = (workspace: any, e: React.MouseEvent) => {
+  const handleStartEdit = (workspace: WorkspaceRecord, e: React.MouseEvent) => {
     e.stopPropagation();
     setEditingId(workspace.id);
     setEditingName(workspace.name);
@@ -61,10 +65,13 @@ export function WorkspaceSwitcher({ isOpen, onClose }: WorkspaceSwitcherProps) {
   const handleSaveEdit = async (workspaceId: string) => {
     if (!editingName.trim()) return;
     
-    const workspace = workspaces.find(w => w.id === workspaceId);
-    if (workspace) {
-      await workspaceStore.save({ ...workspace, name: editingName.trim() });
-      window.location.reload(); // Reload to refresh the workspace list
+    try {
+      await editWorkspace(workspaceId, editingName.trim());
+      setEditingId(null);
+      setEditingName('');
+    } catch (error) {
+      console.error('Failed to update workspace:', error);
+      alert('Failed to update workspace');
     }
   };
 

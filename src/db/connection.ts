@@ -68,7 +68,7 @@ let dbPromise: Promise<IDBPDatabase<VsDeskDB>> | null = null;
 export function getDB(): Promise<IDBPDatabase<VsDeskDB>> {
   if (!dbPromise) {
     dbPromise = openDB<VsDeskDB>(DB_NAME, DB_VERSION, {
-      upgrade(db, oldVersion, newVersion, transaction) {
+      upgrade(db, oldVersion, _newVersion, transaction) {
         // v1: Bookmarks
         if (oldVersion < 1) {
           if (!db.objectStoreNames.contains('bookmarks')) {
