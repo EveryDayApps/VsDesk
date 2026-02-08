@@ -185,3 +185,6 @@ export const bookmarkStore = new BookmarkStore();
 
 ### From user
 - dont generate any md files like implementation details or how to use , unless user says so
+
+### Database Versioning
+- Unless I say "Update the version", do not change the database version. Keep it at version 1.

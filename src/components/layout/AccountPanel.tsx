@@ -1,5 +1,6 @@
 import { Check, Download, LogOut, Monitor, Pencil, Plus, Upload } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
+import { useDialog } from '../../context/DialogContext';
 import { useUser } from '../../context/UserContext';
 import { cn } from '../../utils/cn';
 import { Overlay } from '../ui/Overlay';
@@ -20,6 +21,7 @@ export function AccountPanel({ onClose }: AccountPanelProps) {
     exportData,
     importData
   } = useUser();
+  const { showAlert, showConfirm, showPrompt } = useDialog();
   
   const panelRef = useRef<HTMLDivElement>(null);
   const [isEditingProfile, setIsEditingProfile] = useState(false);
@@ -35,14 +37,14 @@ export function AccountPanel({ onClose }: AccountPanelProps) {
   }, [onClose]);
 
   const handleCreateWorkspace = async () => {
-    const name = prompt('Enter workspace name:');
+    const name = await showPrompt('Enter workspace name:');
     if (name) {
       await createWorkspace(name);
     }
   };
 
   const handleReset = async () => {
-    if (confirm('Are you sure you want to reset all data? This cannot be undone.')) {
+    if (await showConfirm('Are you sure you want to reset all data? This cannot be undone.')) {
       await resetUser();
     }
   };
@@ -61,7 +63,7 @@ export function AccountPanel({ onClose }: AccountPanelProps) {
       URL.revokeObjectURL(url);
     } catch (e) {
       console.error('Export failed', e);
-      alert('Export failed');
+      await showAlert('Export failed');
     }
   };
 
@@ -72,12 +74,12 @@ export function AccountPanel({ onClose }: AccountPanelProps) {
     input.onchange = async (e) => {
       const file = (e.target as HTMLInputElement).files?.[0];
       if (file) {
-        if (confirm('This will replace all current data. Continue?')) {
+        if (await showConfirm('This will replace all current data. Continue?')) {
             try {
                 const text = await file.text();
                 await importData(text);
             } catch (e) {
-                alert('Import failed: ' + e);
+                await showAlert('Import failed: ' + e);
             }
         }
       }

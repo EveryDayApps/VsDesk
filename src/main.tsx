@@ -1,6 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App.tsx'
+import { DialogProvider } from './context/DialogContext.tsx'
 import { SettingsProvider } from './context/SettingsContext.tsx'
 import { UserProvider } from './context/UserContext.tsx'
 import { WorkspaceProvider } from './context/WorkspaceContext.tsx'
@@ -15,9 +16,11 @@ themeManager.init().then(() => {
   <React.StrictMode>
     <UserProvider>
       <SettingsProvider>
-        <WorkspaceProvider workspaces={workspaceRegistry}>
-          <App />
-        </WorkspaceProvider>
+        <DialogProvider>
+          <WorkspaceProvider workspaces={workspaceRegistry}>
+            <App />
+          </WorkspaceProvider>
+        </DialogProvider>
       </SettingsProvider>
     </UserProvider>
     </React.StrictMode>,

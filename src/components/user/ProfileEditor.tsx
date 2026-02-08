@@ -1,5 +1,6 @@
 import { Save, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { useDialog } from '../../context/DialogContext';
 import { useUser } from '../../context/UserContext';
 
 interface ProfileEditorProps {
@@ -8,6 +9,7 @@ interface ProfileEditorProps {
 
 export function ProfileEditor({ onClose }: ProfileEditorProps) {
   const { profile, updateProfile } = useUser();
+  const { showAlert } = useDialog();
   
   const [displayName, setDisplayName] = useState(profile?.displayName || 'User');
   const [avatarUrl, setAvatarUrl] = useState(profile?.avatarUrl || '');
@@ -33,7 +35,7 @@ export function ProfileEditor({ onClose }: ProfileEditorProps) {
       onClose();
     } catch (error) {
       console.error('Failed to update profile:', error);
-      alert('Failed to save profile');
+      await showAlert('Failed to save profile');
     } finally {
       setIsSaving(false);
     }

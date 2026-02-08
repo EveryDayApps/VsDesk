@@ -1,5 +1,6 @@
 import { Check, Edit2, Plus, Trash2 } from 'lucide-react';
 import { useState } from 'react';
+import { useDialog } from '../../context/DialogContext';
 import { useUser } from '../../context/UserContext';
 import { WorkspaceRecord } from '../../db';
 import { Overlay } from '../ui/Overlay';
@@ -11,6 +12,7 @@ interface WorkspaceSwitcherProps {
 
 export function WorkspaceSwitcher({ isOpen, onClose }: WorkspaceSwitcherProps) {
   const { workspaces, activeWorkspaceId, setActiveWorkspace, createWorkspace, editWorkspace, deleteWorkspace } = useUser();
+  const { showAlert, showConfirm } = useDialog();
   const [newWorkspaceName, setNewWorkspaceName] = useState('');
   const [isCreating, setIsCreating] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -36,22 +38,22 @@ export function WorkspaceSwitcher({ isOpen, onClose }: WorkspaceSwitcherProps) {
     
     // Don't allow deleting the last workspace
     if (workspaces.length <= 1) {
-      alert('Cannot delete the last workspace');
+      await showAlert('Cannot delete the last workspace');
       return;
     }
 
     // Don't allow deleting the active workspace
     if (workspaceId === activeWorkspaceId) {
-      alert('Cannot delete the active workspace. Switch to another workspace first.');
+      await showAlert('Cannot delete the active workspace. Switch to another workspace first.');
       return;
     }
 
-    if (confirm('Are you sure you want to delete this workspace?')) {
+    if (await showConfirm('Are you sure you want to delete this workspace?')) {
       try {
         await deleteWorkspace(workspaceId);
       } catch (error) {
         console.error('Failed to delete workspace:', error);
-        alert('Failed to delete workspace');
+        await showAlert('Failed to delete workspace');
       }
     }
   };
@@ -71,7 +73,7 @@ export function WorkspaceSwitcher({ isOpen, onClose }: WorkspaceSwitcherProps) {
       setEditingName('');
     } catch (error) {
       console.error('Failed to update workspace:', error);
-      alert('Failed to update workspace');
+      await showAlert('Failed to update workspace');
     }
   };
 

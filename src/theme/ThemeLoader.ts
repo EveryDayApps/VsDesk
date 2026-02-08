@@ -71,13 +71,59 @@ export class ThemeLoader {
   }
 
   /**
+   * Strips JSONC features (comments and trailing commas) so
+   * standard JSON.parse can handle VS Code theme files.
+   */
+  private stripJsonc(text: string): string {
+    let result = '';
+    let i = 0;
+    const len = text.length;
+
+    while (i < len) {
+      // String literal — copy verbatim
+      if (text[i] === '"') {
+        let j = i + 1;
+        while (j < len && text[j] !== '"') {
+          if (text[j] === '\\') j++; // skip escaped char
+          j++;
+        }
+        result += text.slice(i, j + 1);
+        i = j + 1;
+        continue;
+      }
+
+      // Line comment
+      if (text[i] === '/' && text[i + 1] === '/') {
+        i += 2;
+        while (i < len && text[i] !== '\n') i++;
+        continue;
+      }
+
+      // Block comment
+      if (text[i] === '/' && text[i + 1] === '*') {
+        i += 2;
+        while (i < len && !(text[i] === '*' && text[i + 1] === '/')) i++;
+        i += 2;
+        continue;
+      }
+
+      result += text[i];
+      i++;
+    }
+
+    // Remove trailing commas before } or ]
+    return result.replace(/,\s*([}\]])/g, '$1');
+  }
+
+  /**
    * Parses and validates a user-provided JSON string.
+   * Handles JSONC (comments + trailing commas) used by VS Code themes.
    * Returns the Theme on success, throws on failure.
    */
   parseImport(jsonString: string): Theme {
     let raw: unknown;
     try {
-      raw = JSON.parse(jsonString);
+      raw = JSON.parse(this.stripJsonc(jsonString));
     } catch {
       throw new Error('Invalid JSON: could not parse the file.');
     }

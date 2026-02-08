@@ -1,6 +1,6 @@
 import { type DBSchema, type IDBPDatabase, openDB } from 'idb';
-import { DB_NAME, DB_VERSION } from './config';
 import type { ThemeRecord } from '../theme/types';
+import { DB_NAME, DB_VERSION } from './config';
 
 export interface BookmarkRecord {
   id: string;
@@ -73,41 +73,35 @@ let dbPromise: Promise<IDBPDatabase<VsDeskDB>> | null = null;
 export function getDB(): Promise<IDBPDatabase<VsDeskDB>> {
   if (!dbPromise) {
     dbPromise = openDB<VsDeskDB>(DB_NAME, DB_VERSION, {
-      upgrade(db, oldVersion, _newVersion, transaction) {
-        // v1: Bookmarks
+      upgrade(db, oldVersion, _newVersion, _transaction) {
+        // Only keep version 1: Create all stores
         if (oldVersion < 1) {
+          // Bookmarks
           if (!db.objectStoreNames.contains('bookmarks')) {
             const bookmarkStore = db.createObjectStore('bookmarks', {
               keyPath: 'id',
             });
             bookmarkStore.createIndex('parentId', 'parentId');
+            bookmarkStore.createIndex('workspaceId', 'workspaceId');
           }
-        }
 
-        // v2: Users, Profiles, Workspaces
-        if (oldVersion < 2) {
+          // Users
           if (!db.objectStoreNames.contains('users')) {
             db.createObjectStore('users', { keyPath: 'id' });
           }
 
+          // Profiles
           if (!db.objectStoreNames.contains('profiles')) {
             db.createObjectStore('profiles', { keyPath: 'id' });
           }
 
+          // Workspaces
           if (!db.objectStoreNames.contains('workspaces')) {
             const workspaceStore = db.createObjectStore('workspaces', { keyPath: 'id' });
             workspaceStore.createIndex('userId', 'userId');
           }
 
-          // Add workspaceId index to bookmarks
-          const bookmarkStore = transaction.objectStore('bookmarks');
-          if (!bookmarkStore.indexNames.contains('workspaceId')) {
-            bookmarkStore.createIndex('workspaceId', 'workspaceId');
-          }
-        }
-
-        // v3: Themes
-        if (oldVersion < 3) {
+          // Themes
           if (!db.objectStoreNames.contains('themes')) {
             db.createObjectStore('themes', { keyPath: 'id' });
           }

@@ -1,12 +1,13 @@
 import {
-  Github,
-  Monitor,
-  Palette,
-  Search,
-  Settings,
-  Trash2
+    Github,
+    Monitor,
+    Palette,
+    Search,
+    Settings,
+    Trash2
 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
+import { useDialog } from '../../context/DialogContext';
 import type { Theme } from '../../theme/types';
 import { cn } from '../../utils/cn';
 import { Overlay } from '../ui/Overlay';
@@ -30,6 +31,7 @@ interface CommandItem {
 }
 
 export function CommandPalette({ isOpen, onClose, activeTheme, themes, onSetTheme, onOpenSettings }: CommandPaletteProps) {
+  const { showAlert, showConfirm } = useDialog();
   const [query, setQuery] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
   const inputRef = useRef<any>(null);
@@ -49,7 +51,7 @@ export function CommandPalette({ isOpen, onClose, activeTheme, themes, onSetThem
       label: 'New File',
       subLabel: 'Create a new text file',
       icon: Monitor,
-      action: () => alert('New File created! (Mock)'),
+      action: async () => await showAlert('New File created! (Mock)'),
       shortcut: '⌘N',
     },
     {
@@ -65,8 +67,8 @@ export function CommandPalette({ isOpen, onClose, activeTheme, themes, onSetThem
       label: 'Clear All Data',
       subLabel: 'Reset Notes and Todos',
       icon: Trash2,
-      action: () => {
-        if (confirm('Are you sure you want to clear all data?')) {
+      action: async () => {
+        if (await showConfirm('Are you sure you want to clear all data?')) {
           localStorage.clear();
           window.location.reload();
         }

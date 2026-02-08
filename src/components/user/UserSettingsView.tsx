@@ -1,5 +1,6 @@
-import { Pencil, Plus, Trash2 } from 'lucide-react';
+import { Clipboard, FileJson, FileUp, Pencil, Plus, Trash2 } from 'lucide-react';
 import { useState } from 'react';
+import { useDialog } from '../../context/DialogContext';
 import { useUser } from '../../context/UserContext';
 import { cn } from '../../utils/cn';
 
@@ -12,8 +13,11 @@ export function UserSettingsView() {
     createWorkspace,
     updateProfile,
     editWorkspace,
-    deleteWorkspace
+    deleteWorkspace,
+    importData,
+    exportData
   } = useUser();
+  const { showAlert, showConfirm, showPrompt } = useDialog();
 
   const [displayName, setDisplayName] = useState(profile?.displayName || 'User');
   const [avatarUrl, setAvatarUrl] = useState(profile?.avatarUrl || '');
@@ -21,6 +25,8 @@ export function UserSettingsView() {
   const [isSaving, setIsSaving] = useState(false);
   const [editingWorkspaceId, setEditingWorkspaceId] = useState<string | null>(null);
   const [editingWorkspaceName, setEditingWorkspaceName] = useState('');
+  const [importText, setImportText] = useState('');
+  const [isImporting, setIsImporting] = useState(false);
 
   const handleSaveProfile = async () => {
     setIsSaving(true);
@@ -30,23 +36,23 @@ export function UserSettingsView() {
         avatarUrl: avatarUrl.trim() || undefined,
         bio: bio.trim() || undefined,
       });
-      alert('Profile saved successfully!');
+      await showAlert('Profile saved successfully!');
     } catch (error) {
       console.error('Failed to update profile:', error);
-      alert('Failed to save profile');
+      await showAlert('Failed to save profile');
     } finally {
       setIsSaving(false);
     }
   };
 
   const handleCreateWorkspace = async () => {
-    const name = prompt('Enter workspace name:');
+    const name = await showPrompt('Enter workspace name:');
     if (name?.trim()) {
       try {
         await createWorkspace(name.trim());
       } catch (error) {
         console.error('Failed to create workspace:', error);
-        alert('Failed to create workspace');
+        await showAlert('Failed to create workspace');
       }
     }
   };
@@ -67,7 +73,7 @@ export function UserSettingsView() {
       await editWorkspace(editingWorkspaceId, editingWorkspaceName.trim());
     } catch (error) {
       console.error('Failed to update workspace:', error);
-      alert('Failed to update workspace');
+      await showAlert('Failed to update workspace');
     } finally {
       setEditingWorkspaceId(null);
       setEditingWorkspaceName('');
@@ -75,13 +81,67 @@ export function UserSettingsView() {
   };
 
   const handleDeleteWorkspace = async (workspaceId: string) => {
-    if (confirm('Are you sure you want to delete this workspace?')) {
+    if (await showConfirm('Are you sure you want to delete this workspace?')) {
       try {
         await deleteWorkspace(workspaceId);
       } catch (error) {
         console.error('Failed to delete workspace:', error);
-        alert(error instanceof Error ? error.message : 'Failed to delete workspace');
+        await showAlert(error instanceof Error ? error.message : 'Failed to delete workspace');
       }
+    }
+  };
+
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      const content = e.target?.result as string;
+      if (content) {
+        try {
+          setIsImporting(true);
+          await importData(content);
+        } catch (error) {
+          console.error('Import failed:', error);
+          await showAlert('Failed to import data: ' + (error instanceof Error ? error.message : 'Unknown error'));
+          setIsImporting(false);
+        }
+      }
+    };
+    reader.readAsText(file);
+    // Reset inputs
+    event.target.value = '';
+  };
+
+  const handlePasteImport = async () => {
+    if (!importText.trim()) return;
+    
+    try {
+      setIsImporting(true);
+      await importData(importText);
+    } catch (error) {
+      console.error('Import failed:', error);
+      await showAlert('Failed to import data: ' + (error instanceof Error ? error.message : 'Unknown error'));
+      setIsImporting(false);
+    }
+  };
+
+  const handleExport = async () => {
+    try {
+      const data = await exportData();
+      const blob = new Blob([data], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `vsdesk-backup-${new Date().toISOString().split('T')[0]}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Export failed:', error);
+      await showAlert('Failed to export data');
     }
   };
 
@@ -275,6 +335,92 @@ export function UserSettingsView() {
               <Plus className="w-4 h-4" />
               <span>New Workspace</span>
             </button>
+          </div>
+        </section>
+
+        {/* Data Management Section */}
+        <section className="pb-8">
+          <h2 className="text-lg font-semibold text-[var(--text-heading)] mb-4 flex items-center gap-2">
+            <div className="w-1 h-5 bg-[var(--focus-border)]" />
+            Data Management
+          </h2>
+
+          <div className="bg-[var(--sidebar-bg)] border border-[var(--border-secondary)] rounded-sm overflow-hidden p-6 space-y-8">
+            
+            {/* Export Section */}
+            <div className="space-y-2">
+              <h3 className="text-sm font-medium text-[var(--text-heading)]">Export Data</h3>
+              <p className="text-xs text-[var(--text-muted)] mb-3">
+                Download a backup of your profiles, workspaces, and settings.
+              </p>
+              <button
+                onClick={handleExport}
+                className="flex items-center gap-2 px-4 py-2 text-sm bg-[var(--input-bg)] hover:bg-[var(--hover-bg)] text-[var(--text-primary)] border border-[var(--border-color)] rounded-sm transition-colors"
+              >
+                <FileJson className="w-4 h-4" />
+                Export Backup
+              </button>
+            </div>
+
+            <div className="w-full h-px bg-[var(--border-secondary)]" />
+
+            {/* Import Section */}
+            <div className="space-y-6">
+              <div>
+                <h3 className="text-sm font-medium text-[var(--text-heading)] mb-1">Import Data</h3>
+                <p className="text-xs text-[var(--text-muted)]">
+                  Restore from a backup file or paste JSON data directly.
+                </p>
+              </div>
+
+              {/* Option 1: File Import */}
+              <div className="space-y-3">
+                <label className="text-xs font-medium text-[var(--text-heading)] uppercase tracking-wider">
+                  Option 1: Upload JSON File
+                </label>
+                <div className="flex items-center gap-3">
+                  <label className="flex items-center gap-2 px-4 py-2 text-sm bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-[var(--accent-fg)] rounded-sm cursor-pointer transition-colors">
+                    <FileUp className="w-4 h-4" />
+                    {isImporting ? 'Importing...' : 'Select File'}
+                    <input
+                      type="file"
+                      accept=".json"
+                      onChange={handleFileUpload}
+                      disabled={isImporting}
+                      className="hidden"
+                    />
+                  </label>
+                  <span className="text-xs text-[var(--text-muted)]">
+                    Supports .json files
+                  </span>
+                </div>
+              </div>
+
+              {/* Option 2: Paste Import */}
+              <div className="space-y-3">
+                <label className="text-xs font-medium text-[var(--text-heading)] uppercase tracking-wider">
+                  Option 2: Copy & Paste JSON
+                </label>
+                <div className="space-y-3">
+                  <textarea
+                    value={importText}
+                    onChange={(e) => setImportText(e.target.value)}
+                    rows={5}
+                    className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] focus:border-[var(--focus-border)] text-xs font-mono text-[var(--text-primary)] p-3 outline-none rounded-sm resize-y"
+                    placeholder="{ 'users': [...], 'workspaces': [...] }"
+                  />
+                  <button
+                    onClick={handlePasteImport}
+                    disabled={isImporting || !importText.trim()}
+                    className="flex items-center gap-2 px-4 py-2 text-sm bg-[var(--input-bg)] hover:bg-[var(--hover-bg)] text-[var(--text-primary)] border border-[var(--border-color)] rounded-sm transition-colors disabled:opacity-50"
+                  >
+                    <Clipboard className="w-4 h-4" />
+                    {isImporting ? 'Importing...' : 'Import from Text'}
+                  </button>
+                </div>
+              </div>
+            </div>
+
           </div>
         </section>
       </div>

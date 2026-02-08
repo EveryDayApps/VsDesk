@@ -1,6 +1,8 @@
 import {
   Check,
-  Download,
+  Clipboard,
+  FileJson,
+  FileUp,
   Filter,
   Layout,
   LogOut,
@@ -14,6 +16,7 @@ import {
   Zap
 } from 'lucide-react';
 import { useState } from 'react';
+import { useDialog } from '../../context/DialogContext';
 import { SettingsState, useSettings } from '../../context/SettingsContext';
 import { useUser } from '../../context/UserContext';
 import { useTheme } from '../../hooks/useTheme';
@@ -75,6 +78,7 @@ export function SettingsEditor({ onClose }: SettingsEditorProps) {
     exportData,
     importData,
   } = useUser();
+  const { showAlert, showConfirm } = useDialog();
   const { activeTheme, themes, setTheme, importTheme, deleteTheme } = useTheme();
 
   const [activeCategory, setActiveCategory] = useState<string>('Commonly Used');
@@ -86,6 +90,11 @@ export function SettingsEditor({ onClose }: SettingsEditorProps) {
   const [bio, setBio] = useState(profile?.bio || '');
   const [isSaving, setIsSaving] = useState(false);
   const [themeImportError, setThemeImportError] = useState<string | null>(null);
+  const [themeImportText, setThemeImportText] = useState('');
+  
+  // Data management state
+  const [importText, setImportText] = useState('');
+  const [isImporting, setIsImporting] = useState(false);
 
   // Handler functions
   const handleSaveProfile = async () => {
@@ -96,17 +105,17 @@ export function SettingsEditor({ onClose }: SettingsEditorProps) {
         avatarUrl: avatarUrl.trim() || undefined,
         bio: bio.trim() || undefined,
       });
-      alert('Profile saved successfully!');
+      await showAlert('Profile saved successfully!');
     } catch (error) {
       console.error('Failed to update profile:', error);
-      alert('Failed to save profile');
+      await showAlert('Failed to save profile');
     } finally {
       setIsSaving(false);
     }
   };
 
   const handleReset = async () => {
-    if (confirm('Are you sure you want to reset all data? This cannot be undone.')) {
+    if (await showConfirm('Are you sure you want to reset all data? This cannot be undone.')) {
       await resetUser();
     }
   };
@@ -125,51 +134,62 @@ export function SettingsEditor({ onClose }: SettingsEditorProps) {
       URL.revokeObjectURL(url);
     } catch (e) {
       console.error('Export failed', e);
-      alert('Export failed');
+      await showAlert('Export failed');
     }
   };
 
-  const handleImport = () => {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'application/json';
-    input.onchange = async (e) => {
-      const file = (e.target as HTMLInputElement).files?.[0];
-      if (file) {
-        if (confirm('This will replace all current data. Continue?')) {
-          try {
-            const text = await file.text();
-            await importData(text);
-          } catch (e) {
-            alert('Import failed: ' + e);
-          }
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      const content = e.target?.result as string;
+      if (content) {
+        try {
+          setIsImporting(true);
+          await importData(content);
+        } catch (error) {
+          console.error('Import failed:', error);
+          await showAlert('Failed to import data: ' + (error instanceof Error ? error.message : 'Unknown error'));
+          setIsImporting(false);
         }
       }
     };
-    input.click();
+    reader.readAsText(file);
+    // Reset inputs
+    event.target.value = '';
   };
 
-  const handleThemeImport = () => {
+  const handlePasteImport = async () => {
+    if (!importText.trim()) return;
+    
+    try {
+      setIsImporting(true);
+      await importData(importText);
+    } catch (error) {
+      console.error('Import failed:', error);
+      await showAlert('Failed to import data: ' + (error instanceof Error ? error.message : 'Unknown error'));
+      setIsImporting(false);
+    }
+  };
+
+
+
+  const handleThemePaste = async () => {
+    if (!themeImportText.trim()) return;
     setThemeImportError(null);
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = '.json';
-    input.onchange = async (e) => {
-      const file = (e.target as HTMLInputElement).files?.[0];
-      if (!file) return;
-      try {
-        const text = await file.text();
-        const theme = await importTheme(text);
-        await setTheme(theme.id);
-      } catch (err) {
-        setThemeImportError(err instanceof Error ? err.message : 'Import failed');
-      }
-    };
-    input.click();
+    try {
+      const theme = await importTheme(themeImportText);
+      await setTheme(theme.id);
+      setThemeImportText('');
+    } catch (err) {
+      setThemeImportError(err instanceof Error ? err.message : 'Import failed');
+    }
   };
 
   const handleDeleteTheme = async (id: string) => {
-    if (confirm('Delete this imported theme?')) {
+    if (await showConfirm('Delete this imported theme?')) {
       await deleteTheme(id);
     }
   };
@@ -371,19 +391,66 @@ export function SettingsEditor({ onClose }: SettingsEditorProps) {
                     Import Theme
                   </h2>
 
-                  <div className="bg-[var(--sidebar-bg)] border border-[var(--border-secondary)] rounded-sm overflow-hidden">
-                    <button
-                      onClick={handleThemeImport}
-                      className="w-full p-4 flex items-center gap-3 text-sm text-[var(--text-primary)] hover:bg-[var(--hover-bg)] transition-colors"
-                    >
-                      <Upload className="w-4 h-4" />
-                      <div className="flex-1 text-left">
-                        <div className="font-medium">Import VS Code Theme</div>
-                        <div className="text-xs text-[var(--text-muted)]">
-                          Select a .json theme file exported from VS Code or downloaded from GitHub
-                        </div>
+                  <div className="bg-[var(--sidebar-bg)] border border-[var(--border-secondary)] rounded-sm overflow-hidden p-6 space-y-6">
+                    <div>
+                      <p className="text-xs text-[var(--text-muted)]">
+                        Import a VS Code theme from a .json file or paste the JSON content directly.
+                      </p>
+                    </div>
+
+                    {/* Option 1: File Import */}
+                    <div className="space-y-3">
+                      <label className="text-xs font-medium text-[var(--text-heading)] uppercase tracking-wider">
+                        Option 1: Upload Theme File
+                      </label>
+                      <div className="flex items-center gap-3">
+                        <label className="flex items-center gap-2 px-4 py-2 text-sm bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-[var(--accent-fg)] rounded-sm cursor-pointer transition-colors">
+                          <Upload className="w-4 h-4" />
+                          Select File
+                          <input
+                             type="file"
+                             accept=".json"
+                             onChange={(e) => {
+                               const file = e.target.files?.[0];
+                               if (file) {
+                                  file.text().then(text => {
+                                      importTheme(text).then(theme => setTheme(theme.id)).catch(err => setThemeImportError(err.message));
+                                  });
+                                  e.target.value = '';
+                               }
+                             }}
+                             className="hidden"
+                          />
+                        </label>
+                        <span className="text-xs text-[var(--text-muted)]">
+                          Supports .json files
+                        </span>
                       </div>
-                    </button>
+                    </div>
+
+                    {/* Option 2: Paste Import */}
+                    <div className="space-y-3">
+                      <label className="text-xs font-medium text-[var(--text-heading)] uppercase tracking-wider">
+                        Option 2: Copy & Paste JSON
+                      </label>
+                      <div className="space-y-3">
+                        <textarea
+                          value={themeImportText}
+                          onChange={(e) => setThemeImportText(e.target.value)}
+                          rows={5}
+                          className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] focus:border-[var(--focus-border)] text-xs font-mono text-[var(--text-primary)] p-3 outline-none rounded-sm resize-y"
+                          placeholder="{ 'name': 'My Theme', 'colors': { ... } }"
+                        />
+                        <button
+                          onClick={handleThemePaste}
+                          disabled={!themeImportText.trim()}
+                          className="flex items-center gap-2 px-4 py-2 text-sm bg-[var(--input-bg)] hover:bg-[var(--hover-bg)] text-[var(--text-primary)] border border-[var(--border-color)] rounded-sm transition-colors disabled:opacity-50"
+                        >
+                          <Clipboard className="w-4 h-4" />
+                          Import Theme from Text
+                        </button>
+                      </div>
+                    </div>
                   </div>
 
                   {themeImportError && (
@@ -500,27 +567,82 @@ export function SettingsEditor({ onClose }: SettingsEditorProps) {
                     Data Management
                   </h2>
 
-                  <div className="bg-[var(--sidebar-bg)] border border-[var(--border-secondary)] rounded-sm overflow-hidden">
-                    <button
-                      onClick={handleExport}
-                      className="w-full p-4 flex items-center gap-3 text-sm text-[var(--text-primary)] hover:bg-[var(--hover-bg)] transition-colors border-b border-[var(--border-secondary)]"
-                    >
-                      <Download className="w-4 h-4" />
-                      <div className="flex-1 text-left">
-                        <div className="font-medium">Export Data</div>
-                        <div className="text-xs text-[var(--text-muted)]">Download all your data as JSON</div>
+                  <div className="bg-[var(--sidebar-bg)] border border-[var(--border-secondary)] rounded-sm overflow-hidden p-6 space-y-8">
+                    
+                    {/* Export Section */}
+                    <div className="space-y-2">
+                      <h3 className="text-sm font-medium text-[var(--text-heading)]">Export Data</h3>
+                      <p className="text-xs text-[var(--text-muted)] mb-3">
+                        Download a backup of your profiles, workspaces, and settings.
+                      </p>
+                      <button
+                        onClick={handleExport}
+                        className="flex items-center gap-2 px-4 py-2 text-sm bg-[var(--input-bg)] hover:bg-[var(--hover-bg)] text-[var(--text-primary)] border border-[var(--border-color)] rounded-sm transition-colors"
+                      >
+                        <FileJson className="w-4 h-4" />
+                        Export Backup
+                      </button>
+                    </div>
+
+                    <div className="w-full h-px bg-[var(--border-secondary)]" />
+
+                    {/* Import Section */}
+                    <div className="space-y-6">
+                      <div>
+                        <h3 className="text-sm font-medium text-[var(--text-heading)] mb-1">Import Data</h3>
+                        <p className="text-xs text-[var(--text-muted)]">
+                          Restore from a backup file or paste JSON data directly.
+                        </p>
                       </div>
-                    </button>
-                    <button
-                      onClick={handleImport}
-                      className="w-full p-4 flex items-center gap-3 text-sm text-[var(--text-primary)] hover:bg-[var(--hover-bg)] transition-colors"
-                    >
-                      <Upload className="w-4 h-4" />
-                      <div className="flex-1 text-left">
-                        <div className="font-medium">Import Data</div>
-                        <div className="text-xs text-[var(--text-muted)]">Restore data from a backup file</div>
+
+                      {/* Option 1: File Import */}
+                      <div className="space-y-3">
+                        <label className="text-xs font-medium text-[var(--text-heading)] uppercase tracking-wider">
+                          Option 1: Upload JSON File
+                        </label>
+                        <div className="flex items-center gap-3">
+                          <label className="flex items-center gap-2 px-4 py-2 text-sm bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-[var(--accent-fg)] rounded-sm cursor-pointer transition-colors">
+                            <FileUp className="w-4 h-4" />
+                            {isImporting ? 'Importing...' : 'Select File'}
+                            <input
+                              type="file"
+                              accept=".json"
+                              onChange={handleFileUpload}
+                              disabled={isImporting}
+                              className="hidden"
+                            />
+                          </label>
+                          <span className="text-xs text-[var(--text-muted)]">
+                            Supports .json files
+                          </span>
+                        </div>
                       </div>
-                    </button>
+
+                      {/* Option 2: Paste Import */}
+                      <div className="space-y-3">
+                        <label className="text-xs font-medium text-[var(--text-heading)] uppercase tracking-wider">
+                          Option 2: Copy & Paste JSON
+                        </label>
+                        <div className="space-y-3">
+                          <textarea
+                            value={importText}
+                            onChange={(e) => setImportText(e.target.value)}
+                            rows={5}
+                            className="w-full bg-[var(--input-bg)] border border-[var(--border-color)] focus:border-[var(--focus-border)] text-xs font-mono text-[var(--text-primary)] p-3 outline-none rounded-sm resize-y"
+                            placeholder="{ 'users': [...], 'workspaces': [...] }"
+                          />
+                          <button
+                            onClick={handlePasteImport}
+                            disabled={isImporting || !importText.trim()}
+                            className="flex items-center gap-2 px-4 py-2 text-sm bg-[var(--input-bg)] hover:bg-[var(--hover-bg)] text-[var(--text-primary)] border border-[var(--border-color)] rounded-sm transition-colors disabled:opacity-50"
+                          >
+                            <Clipboard className="w-4 h-4" />
+                            {isImporting ? 'Importing...' : 'Import from Text'}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+
                   </div>
                 </section>
 

@@ -186,11 +186,24 @@ export function UserProvider({ children }: { children: ReactNode }) {
   };
 
   const resetUser = async () => {
-      if (user) {
-        await userStore.save({ ...user, onboardingCompleted: false });
-      }
-      // Optional: clear other data
-      window.location.reload(); 
+    const { getDB } = await import('../db');
+    const db = await getDB();
+
+    const tx = db.transaction(
+      ['users', 'profiles', 'workspaces', 'bookmarks', 'themes'],
+      'readwrite',
+    );
+    await Promise.all([
+      tx.objectStore('users').clear(),
+      tx.objectStore('profiles').clear(),
+      tx.objectStore('workspaces').clear(),
+      tx.objectStore('bookmarks').clear(),
+      tx.objectStore('themes').clear(),
+      tx.done,
+    ]);
+
+    localStorage.clear();
+    window.location.reload();
   };
 
   const exportData = async (): Promise<string> => {
