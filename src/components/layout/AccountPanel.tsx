@@ -2,6 +2,7 @@ import { Check, Download, LogOut, Monitor, Pencil, Plus, Upload } from 'lucide-r
 import { useEffect, useRef, useState } from 'react';
 import { useUser } from '../../context/UserContext';
 import { cn } from '../../utils/cn';
+import { Overlay } from '../ui/Overlay';
 import { ProfileEditor } from '../user/ProfileEditor';
 
 interface AccountPanelProps {
@@ -10,7 +11,6 @@ interface AccountPanelProps {
 
 export function AccountPanel({ onClose }: AccountPanelProps) {
   const { 
-    user, 
     profile, 
     workspaces, 
     activeWorkspaceId, 
@@ -178,11 +178,12 @@ export function AccountPanel({ onClose }: AccountPanelProps) {
 
       {/* Profile Editor Modal */}
       {isEditingProfile && (
-        <div className="fixed inset-0 bg-black/50 z-[100] flex items-center justify-center">
-          <div className="w-full max-w-3xl h-[600px] bg-[#1e1e1e] border border-[#454545] shadow-2xl rounded-sm overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+        <Overlay onClose={() => setIsEditingProfile(false)} className="z-[100] flex items-center justify-center">
+          <div className="w-full max-w-3xl h-[600px] bg-[#1e1e1e] border border-[#454545] shadow-2xl rounded-sm overflow-hidden animate-in fade-in zoom-in-95 duration-150"
+               onClick={(e) => e.stopPropagation()}>
             <ProfileEditor onClose={() => setIsEditingProfile(false)} />
           </div>
-        </div>
+        </Overlay>
       )}
     </div>
   );

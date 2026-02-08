@@ -1,13 +1,14 @@
 import {
-    Github,
-    Monitor,
-    Moon,
-    Search,
-    Settings,
-    Trash2
+  Github,
+  Monitor,
+  Moon,
+  Search,
+  Settings,
+  Trash2
 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { cn } from '../../utils/cn';
+import { Overlay } from '../ui/Overlay';
 
 interface CommandPaletteProps {
   isOpen: boolean;
@@ -119,7 +120,7 @@ export function CommandPalette({ isOpen, onClose, toggleTheme, onOpenSettings }:
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center pt-[15vh] bg-black/50 backdrop-blur-sm" onClick={onClose}>
+    <Overlay onClose={onClose} className="flex items-start justify-center pt-[15vh]">
       <div
         className="w-full max-w-2xl bg-vscode-sidebar border border-vscode-focusBorder shadow-2xl rounded-lg overflow-hidden flex flex-col animate-in fade-in zoom-in-95 duration-200"
         onClick={(e) => e.stopPropagation()}
@@ -192,6 +193,6 @@ export function CommandPalette({ isOpen, onClose, toggleTheme, onOpenSettings }:
             <span>v1.0.0</span>
         </div>
       </div>
-    </div>
+    </Overlay>
   );
 }

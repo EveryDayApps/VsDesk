@@ -1,6 +1,7 @@
 import { Check, X } from 'lucide-react';
 import { useState } from 'react';
 import { BookmarkItem } from '../../hooks/useBookmarks';
+import { Overlay } from '../ui/Overlay';
 
 interface EditBookmarkDialogProps {
   item: BookmarkItem;
@@ -26,10 +27,9 @@ export function EditBookmarkDialog({ item, onSave, onClose }: EditBookmarkDialog
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm animate-in fade-in duration-200 p-4">
-      <div className="absolute inset-0" onClick={onClose} />
-
-      <div className="relative w-full max-w-sm bg-[#252526] border border-[#454545] rounded-lg shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col">
+    <Overlay onClose={onClose} className="flex items-center justify-center p-4">
+      <div className="relative w-full max-w-sm bg-[#252526] border border-[#454545] rounded-lg shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col"
+           onClick={(e) => e.stopPropagation()}>
         {/* Header */}
         <div className="flex items-center justify-between px-4 py-3 border-b border-[#454545] bg-[#333333]">
           <h2 className="text-sm font-medium text-white">
@@ -90,6 +90,6 @@ export function EditBookmarkDialog({ item, onSave, onClose }: EditBookmarkDialog
           </button>
         </div>
       </div>
-    </div>
+    </Overlay>
   );
 }

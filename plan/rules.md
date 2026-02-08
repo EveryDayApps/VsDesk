@@ -161,3 +161,27 @@ export class BookmarkStore {
 }
 export const bookmarkStore = new BookmarkStore();
 ```
+
+
+
+
+
+## 9. UI Component Usage (Mandatory)
+
+* **Background Blur / Overlay**:
+  * **ALWAYS** use the generic `Overlay` component (`src/components/ui/Overlay.tsx`) for any modal, dialog, or overlay that requires a background blur.
+  * Do NOT manually implement fixed positioning with backdrop blur for overlays.
+  * Example:
+    ```tsx
+    import { Overlay } from '../ui/Overlay';
+    
+    return (
+      <Overlay onClose={handleClose}>
+        <ModalContent />
+      </Overlay>
+    );
+    ```
+
+
+### From user
+- dont generate any md files like implementation details or how to use , unless user says so

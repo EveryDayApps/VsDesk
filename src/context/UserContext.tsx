@@ -1,11 +1,11 @@
 import { ReactNode, createContext, useContext, useEffect, useState } from 'react';
 import {
-   ProfileRecord,
-   UserRecord,
-   WorkspaceRecord,
-   profileStore,
-   userStore,
-   workspaceStore
+    ProfileRecord,
+    UserRecord,
+    WorkspaceRecord,
+    profileStore,
+    userStore,
+    workspaceStore
 } from '../db';
 
 interface UserContextType {
@@ -72,7 +72,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
     const defaultWorkspace: WorkspaceRecord = {
       id: defaultWorkspaceId,
       userId: userId,
-      name: 'Default',
+      name: 'main',
       createdAt: timestamp,
       lastUsedAt: timestamp,
     };
