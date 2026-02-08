@@ -5,4 +5,5 @@ export { BookmarkStore, bookmarkStore } from './stores/bookmarkStore';
 export { ProfileStore, profileStore } from './stores/profileStore';
 export { UserStore, userStore } from './stores/userStore';
 export { WorkspaceStore, workspaceStore } from './stores/workspaceStore';
+export { ThemeStore, themeStore } from './stores/themeStore';
 

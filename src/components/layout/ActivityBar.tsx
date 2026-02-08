@@ -49,13 +49,13 @@ export function ActivityBar({ activeWorkspaceId, onWorkspaceChange }: ActivityBa
               whileDrag={{ scale: 1.1, opacity: 0.8 }}
               className={cn(
                 'group relative flex items-center justify-center w-12 h-12 transition-colors hover:text-white cursor-grab active:cursor-grabbing',
-                activeWorkspaceId === workspaceId ? 'text-white' : 'text-vscode-text opacity-60 hover:opacity-100'
+                activeWorkspaceId === workspaceId ? 'text-[var(--activitybar-fg)]' : 'text-vscode-text opacity-60 hover:opacity-100'
               )}
               title={workspace.title}
               onClick={() => onWorkspaceChange(workspaceId)}
             >
               {activeWorkspaceId === workspaceId && (
-                <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-vscode-white" />
+                <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-[var(--activitybar-fg)]" />
               )}
               <Icon className="w-6 h-6 stroke-1 pointer-events-none" />
             </Reorder.Item>
@@ -73,8 +73,8 @@ export function ActivityBar({ activeWorkspaceId, onWorkspaceChange }: ActivityBa
               className={cn(
                 'group flex items-center justify-center w-12 h-12 transition-colors',
                 activeWorkspaceId === workspace.id
-                  ? 'text-white'
-                  : 'text-vscode-text opacity-60 hover:text-white hover:opacity-100'
+                  ? 'text-[var(--activitybar-fg)]'
+                  : 'text-vscode-text opacity-60 hover:text-[var(--activitybar-fg)] hover:opacity-100'
               )}
               title={workspace.title}
             >

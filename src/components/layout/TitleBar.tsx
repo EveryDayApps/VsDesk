@@ -49,12 +49,12 @@ export function TitleBar({ onSearchClick }: TitleBarProps) {
       {/* Right Section: Window Controls */}
       <div className="flex items-center justify-end space-x-3 w-1/3">
         <div className="flex space-x-2 mr-2">
-           <LayoutTemplate className="w-4 h-4 text-vscode-text hover:text-white cursor-pointer transition-colors" />
+           <LayoutTemplate className="w-4 h-4 text-vscode-text hover:text-[var(--titlebar-fg)] cursor-pointer transition-colors" />
         </div>
         <div className="flex items-center space-x-4 pl-4 border-l border-vscode-sidebar">
-          <Minimize2 className="w-3 h-3 hover:text-white cursor-pointer transition-colors" />
-          <Maximize2 className="w-3 h-3 hover:text-white cursor-pointer transition-colors" />
-          <X className="w-3 h-3 hover:text-red-500 cursor-pointer transition-colors" />
+          <Minimize2 className="w-3 h-3 hover:text-[var(--titlebar-fg)] cursor-pointer transition-colors" />
+          <Maximize2 className="w-3 h-3 hover:text-[var(--titlebar-fg)] cursor-pointer transition-colors" />
+          <X className="w-3 h-3 hover:text-[var(--text-error)] cursor-pointer transition-colors" />
         </div>
       </div>
     </div>

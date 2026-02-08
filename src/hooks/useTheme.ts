@@ -1,18 +1,59 @@
-import { useEffect } from 'react';
-import { useLocalStorage } from './useLocalStorage';
+import { useCallback, useEffect, useState } from 'react';
+import { themeManager } from '../theme/ThemeManager';
+import type { Theme } from '../theme/types';
 
 export function useTheme() {
-  const [theme, setTheme] = useLocalStorage<'dark' | 'light'>('vshome-theme', 'dark');
+  const [activeTheme, setActiveTheme] = useState<Theme | null>(null);
+  const [themes, setThemes] = useState<Theme[]>([]);
+  const [initialized, setInitialized] = useState(false);
 
   useEffect(() => {
-    const root = window.document.documentElement;
-    root.classList.remove('light', 'dark');
-    root.classList.add(theme);
-  }, [theme]);
+    let mounted = true;
 
-  const toggleTheme = () => {
-    setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
+    const init = async () => {
+      await themeManager.init();
+      if (!mounted) return;
+
+      setActiveTheme(themeManager.getActiveTheme());
+      setThemes(themeManager.getThemes());
+      setInitialized(true);
+    };
+
+    init();
+
+    const unsubscribe = themeManager.onChange((theme) => {
+      if (!mounted) return;
+      setActiveTheme(theme);
+      setThemes(themeManager.getThemes());
+    });
+
+    return () => {
+      mounted = false;
+      unsubscribe();
+    };
+  }, []);
+
+  const setTheme = useCallback(async (id: string) => {
+    await themeManager.setTheme(id);
+  }, []);
+
+  const importTheme = useCallback(async (jsonString: string) => {
+    const theme = await themeManager.importTheme(jsonString);
+    setThemes(themeManager.getThemes());
+    return theme;
+  }, []);
+
+  const deleteTheme = useCallback(async (id: string) => {
+    await themeManager.deleteTheme(id);
+    setThemes(themeManager.getThemes());
+  }, []);
+
+  return {
+    activeTheme,
+    themes,
+    initialized,
+    setTheme,
+    importTheme,
+    deleteTheme,
   };
-
-  return { theme, toggleTheme };
 }

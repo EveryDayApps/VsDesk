@@ -88,21 +88,21 @@ export function AccountPanel({ onClose }: AccountPanelProps) {
   return (
     <div 
       ref={panelRef} 
-      className="absolute left-12 bottom-12 w-72 bg-[#252526] border border-[#454545] shadow-xl text-vscode-foreground z-50 rounded-sm overflow-hidden animate-in fade-in zoom-in-95 duration-100"
+      className="absolute left-12 bottom-12 w-72 bg-[var(--sidebar-bg)] border border-[var(--border-color)] shadow-xl text-vscode-foreground z-50 rounded-sm overflow-hidden animate-in fade-in zoom-in-95 duration-100"
     >
       {/* Profile Header */}
-      <div className="p-4 border-b border-[#454545] bg-[#333333]">
+      <div className="p-4 border-b border-[var(--border-color)] bg-[var(--activitybar-bg)]">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-vscode-activityBarBadge-bg flex items-center justify-center text-white font-bold text-lg">
+          <div className="w-10 h-10 rounded-full bg-vscode-activityBarBadge-bg flex items-center justify-center text-[var(--badge-fg)] font-bold text-lg">
              {profile?.avatarUrl ? <img src={profile.avatarUrl} className="w-full h-full rounded-full" /> : (profile?.displayName?.[0] || 'U')}
           </div>
           <div className="flex-1 min-w-0">
-            <div className="font-medium truncate text-white">{profile?.displayName || 'User'}</div>
-            <div className="text-xs text-stone-400">Local Account</div>
+            <div className="font-medium truncate text-[var(--text-heading)]">{profile?.displayName || 'User'}</div>
+            <div className="text-xs text-[var(--text-muted)]">Local Account</div>
           </div>
           <button
             onClick={() => setIsEditingProfile(true)}
-            className="p-1.5 hover:bg-[#454545] rounded text-[#cccccc] hover:text-white transition-colors"
+            className="p-1.5 hover:bg-[var(--hover-bg)] rounded text-[var(--text-primary)] hover:text-[var(--text-heading)] transition-colors"
             title="Edit Profile"
           >
             <Pencil className="w-4 h-4" />
@@ -112,7 +112,7 @@ export function AccountPanel({ onClose }: AccountPanelProps) {
 
       {/* Workspaces Section */}
       <div className="py-2">
-        <div className="px-3 pb-1 text-[11px] font-semibold text-[#969696] uppercase tracking-wider">
+        <div className="px-3 pb-1 text-[11px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider">
           Workspaces
         </div>
         <div className="max-h-48 overflow-y-auto custom-scrollbar">
@@ -121,8 +121,8 @@ export function AccountPanel({ onClose }: AccountPanelProps) {
               key={ws.id}
               onClick={() => setActiveWorkspace(ws.id)}
               className={cn(
-                "w-full text-left px-3 py-1.5 flex items-center text-sm hover:bg-[#2a2d2e] focus:outline-none focus:bg-[#094771] focus:text-white transition-colors",
-                activeWorkspaceId === ws.id ? "text-white" : "text-[#cccccc]"
+                "w-full text-left px-3 py-1.5 flex items-center text-sm hover:bg-[var(--hover-bg)] focus:outline-none focus:bg-[var(--selection-bg)] focus:text-white transition-colors",
+                activeWorkspaceId === ws.id ? "text-[var(--text-heading)]" : "text-[var(--text-primary)]"
               )}
             >
               <div className="w-5 flex justify-center sticky">
@@ -134,7 +134,7 @@ export function AccountPanel({ onClose }: AccountPanelProps) {
         </div>
         <button
           onClick={handleCreateWorkspace}
-          className="w-full text-left px-3 py-1.5 flex items-center text-sm text-[#cccccc] hover:bg-[#2a2d2e] hover:text-white transition-colors mt-1"
+          className="w-full text-left px-3 py-1.5 flex items-center text-sm text-[var(--text-primary)] hover:bg-[var(--hover-bg)] hover:text-[var(--text-heading)] transition-colors mt-1"
         >
           <div className="w-5 flex justify-center">
             <Plus className="w-3.5 h-3.5" />
@@ -143,31 +143,31 @@ export function AccountPanel({ onClose }: AccountPanelProps) {
         </button>
       </div>
 
-      <div className="h-px bg-[#454545] my-1" />
+      <div className="h-px bg-[var(--border-color)] my-1" />
 
       {/* Actions */}
       <div className="py-1">
-        <button className="w-full text-left px-3 py-1.5 flex items-center text-sm text-[#cccccc] hover:bg-[#2a2d2e] hover:text-white transition-colors">
+        <button className="w-full text-left px-3 py-1.5 flex items-center text-sm text-[var(--text-primary)] hover:bg-[var(--hover-bg)] hover:text-[var(--text-heading)] transition-colors">
             <div className="w-5 flex justify-center"><Monitor className="w-3.5 h-3.5" /></div>
             <span>Display Settings</span>
         </button>
-        <button onClick={handleExport} className="w-full text-left px-3 py-1.5 flex items-center text-sm text-[#cccccc] hover:bg-[#2a2d2e] hover:text-white transition-colors">
+        <button onClick={handleExport} className="w-full text-left px-3 py-1.5 flex items-center text-sm text-[var(--text-primary)] hover:bg-[var(--hover-bg)] hover:text-[var(--text-heading)] transition-colors">
             <div className="w-5 flex justify-center"><Download className="w-3.5 h-3.5" /></div>
             <span>Export Data</span>
         </button>
-        <button onClick={handleImport} className="w-full text-left px-3 py-1.5 flex items-center text-sm text-[#cccccc] hover:bg-[#2a2d2e] hover:text-white transition-colors">
+        <button onClick={handleImport} className="w-full text-left px-3 py-1.5 flex items-center text-sm text-[var(--text-primary)] hover:bg-[var(--hover-bg)] hover:text-[var(--text-heading)] transition-colors">
             <div className="w-5 flex justify-center"><Upload className="w-3.5 h-3.5" /></div>
             <span>Import Data</span>
         </button>
       </div>
 
-      <div className="h-px bg-[#454545] my-1" />
+      <div className="h-px bg-[var(--border-color)] my-1" />
       
       {/* Danger Zone */}
       <div className="py-1">
         <button 
           onClick={handleReset}
-          className="w-full text-left px-3 py-1.5 flex items-center text-sm text-red-400 hover:bg-[#2a2d2e] hover:text-red-300 transition-colors"
+          className="w-full text-left px-3 py-1.5 flex items-center text-sm text-[var(--text-error)] hover:bg-[var(--hover-bg)] hover:text-[var(--text-error-hover)] transition-colors"
         >
           <div className="w-5 flex justify-center">
             <LogOut className="w-3.5 h-3.5" />
@@ -179,7 +179,7 @@ export function AccountPanel({ onClose }: AccountPanelProps) {
       {/* Profile Editor Modal */}
       {isEditingProfile && (
         <Overlay onClose={() => setIsEditingProfile(false)} className="z-[100] flex items-center justify-center">
-          <div className="w-full max-w-3xl h-[600px] bg-[#1e1e1e] border border-[#454545] shadow-2xl rounded-sm overflow-hidden animate-in fade-in zoom-in-95 duration-150"
+          <div className="w-full max-w-3xl h-[600px] bg-[var(--app-bg)] border border-[var(--border-color)] shadow-2xl rounded-sm overflow-hidden animate-in fade-in zoom-in-95 duration-150"
                onClick={(e) => e.stopPropagation()}>
             <ProfileEditor onClose={() => setIsEditingProfile(false)} />
           </div>

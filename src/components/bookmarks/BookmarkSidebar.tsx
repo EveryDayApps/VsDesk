@@ -29,7 +29,7 @@ function Favicon({ url }: { url: string }) {
   const faviconUrl = getFaviconUrl(url);
 
   if (!faviconUrl || failed) {
-    return <ExternalLink className="w-4 h-4 text-blue-400/80" />;
+    return <ExternalLink className="w-4 h-4 text-[var(--accent)]" />;
   }
 
   return (
@@ -75,7 +75,7 @@ export function BookmarkSidebar() {
         <div key={item.id}>
           <div
             className={cn(
-              'group flex items-center px-2 py-1 cursor-pointer select-none transition-colors text-sm text-gray-400 hover:bg-vscode-list-hover hover:text-white'
+              'group flex items-center px-2 py-1 cursor-pointer select-none transition-colors text-sm text-[var(--text-secondary)] hover:bg-vscode-list-hover hover:text-[var(--text-heading)]'
             )}
             style={{ paddingLeft: `${depth * 12 + 8}px` }}
             onClick={() => {
@@ -101,14 +101,14 @@ export function BookmarkSidebar() {
             <span className="mr-2 shrink-0">
               {isFolder ? (
                 item.collapsed ? (
-                  <Folder className="w-4 h-4 text-yellow-500/80" />
+                  <Folder className="w-4 h-4 text-[var(--accent)]" />
                 ) : (
-                  <FolderOpen className="w-4 h-4 text-yellow-500/80" />
+                  <FolderOpen className="w-4 h-4 text-[var(--accent)]" />
                 )
               ) : item.url ? (
                 <Favicon url={item.url} />
               ) : (
-                <ExternalLink className="w-4 h-4 text-blue-400/80" />
+                <ExternalLink className="w-4 h-4 text-[var(--accent)]" />
               )}
             </span>
 
@@ -123,7 +123,7 @@ export function BookmarkSidebar() {
                     e.stopPropagation();
                     openDialog(item.id, item.label);
                   }}
-                  className="p-0.5 hover:text-white rounded hover:bg-[#454545] transition-colors"
+                  className="p-0.5 hover:text-[var(--text-heading)] rounded hover:bg-[var(--hover-bg)] transition-colors"
                   title="Add to folder"
                 >
                   <Plus className="w-3.5 h-3.5" />
@@ -134,7 +134,7 @@ export function BookmarkSidebar() {
                   e.stopPropagation();
                   setEditingItem(item);
                 }}
-                className="p-0.5 hover:text-white rounded hover:bg-[#454545] transition-colors"
+                className="p-0.5 hover:text-[var(--text-heading)] rounded hover:bg-[var(--hover-bg)] transition-colors"
                 title="Edit"
               >
                 <Pencil className="w-3.5 h-3.5" />
@@ -144,7 +144,7 @@ export function BookmarkSidebar() {
                   e.stopPropagation();
                   removeItem(item.id);
                 }}
-                className="p-0.5 hover:text-red-400 rounded hover:bg-[#454545] transition-colors"
+                className="p-0.5 hover:text-[var(--text-error)] rounded hover:bg-[var(--hover-bg)] transition-colors"
                 title="Delete"
               >
                 <Trash2 className="w-3.5 h-3.5" />
@@ -162,12 +162,12 @@ export function BookmarkSidebar() {
   };
 
   return (
-    <div className="w-64 bg-vscode-sidebar border-r border-gray-800 flex flex-col h-full pt-2">
+    <div className="w-64 bg-vscode-sidebar border-r border-[var(--border-color)] flex flex-col h-full pt-2">
       <div className="px-5 mb-2 flex items-center justify-between text-xs text-vscode-text uppercase tracking-wider font-semibold">
         <span>Bookmarks</span>
         <button
           onClick={() => openDialog(null, null)}
-          className="hover:text-white transition-colors"
+          className="hover:text-[var(--text-heading)] transition-colors"
           title="Add bookmark"
         >
           <Plus className="w-4 h-4 cursor-pointer" />
@@ -176,7 +176,7 @@ export function BookmarkSidebar() {
 
       <vscode-scrollable className="flex-1">
         {bookmarks.length === 0 ? (
-          <div className="px-5 py-4 text-xs text-gray-500 text-center">
+          <div className="px-5 py-4 text-xs text-[var(--text-muted)] text-center">
             No bookmarks yet. Click + to add one.
           </div>
         ) : (

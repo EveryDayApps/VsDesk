@@ -19,7 +19,7 @@ export function StatusBar() {
 
   return (
     <>
-      <footer className="h-6 min-h-[1.5rem] bg-vscode-statusBar text-white flex items-center justify-between px-2 text-xs select-none">
+      <footer className="h-6 min-h-[1.5rem] bg-vscode-statusBar text-[var(--statusbar-fg)] flex items-center justify-between px-2 text-xs select-none">
         <div className="flex items-center space-x-3">
           <div 
             className="flex items-center space-x-1 hover:bg-white/10 px-1 py-0.5 rounded cursor-pointer transition-colors"

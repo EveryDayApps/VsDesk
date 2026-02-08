@@ -7,9 +7,52 @@
   line-height: 1.5;
   font-weight: 400;
 
+  /*
+   * Default values for initial render before ThemeApplier runs.
+   * ThemeApplier overrides all variables at runtime.
+   */
   color-scheme: dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #1e1e1e;
+  color: var(--text-primary, #cccccc);
+  background-color: var(--app-bg, #1e1e1e);
+
+  /* App design system variables */
+  --app-bg: #1e1e1e;
+  --sidebar-bg: #252526;
+  --activitybar-bg: #333333;
+  --panel-bg: #1e1e1e;
+  --statusbar-bg: #007acc;
+  --titlebar-bg: #3c3c3c;
+  --widget-bg: #252526;
+  --input-bg: #3c3c3c;
+  --input-fg: #cccccc;
+  --input-border: #3e3e42;
+  --hover-bg: #2a2d2e;
+  --selection-bg: #04395e;
+  --selection-fg: #ffffff;
+  --active-bg: #37373d;
+  --text-primary: #cccccc;
+  --text-secondary: #969696;
+  --text-muted: #858585;
+  --text-heading: #d4d4d4;
+  --border-color: #3e3e42;
+  --border-secondary: #2b2b2b;
+  --focus-border: #007fd4;
+  --accent: #0e639c;
+  --accent-fg: #ffffff;
+  --accent-hover: #1177bb;
+  --btn-secondary-bg: #3a3d41;
+  --btn-secondary-fg: #cccccc;
+  --btn-secondary-hover: #45494e;
+  --badge-bg: #4d4d4d;
+  --badge-fg: #ffffff;
+  --activitybar-fg: #ffffff;
+  --sidebar-fg: #cccccc;
+  --statusbar-fg: #ffffff;
+  --titlebar-fg: #cccccc;
+  --tab-active-bg: #1e1e1e;
+  --tab-active-fg: #ffffff;
+  --tab-inactive-bg: #2d2d2d;
+  --tab-inactive-fg: #969696;
 
   /* VSCode Elements CSS Variables */
   --vscode-font-family: Inter, system-ui, sans-serif;
@@ -36,6 +79,9 @@
   --vscode-scrollbarSlider-background: rgba(121, 121, 121, 0.4);
   --vscode-scrollbarSlider-hoverBackground: rgba(100, 100, 100, 0.7);
   --vscode-scrollbarSlider-activeBackground: rgba(191, 191, 191, 0.4);
+  --text-error: #f87171;
+  --text-error-hover: #fca5a5;
+  --bg-error-hover: #5a1d1d;
 }
 
 body {

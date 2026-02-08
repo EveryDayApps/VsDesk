@@ -1,0 +1,1 @@
+- remove Top Bar (file, edit, view, etc.) or make it something else in our app context

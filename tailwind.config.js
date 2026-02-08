@@ -9,16 +9,27 @@ export default {
     extend: {
       colors: {
         vscode: {
-            bg: '#1e1e1e',
-            sidebar: '#252526',
-            activityBar: '#333333',
-            statusBar: '#007acc',
-            panel: '#1e1e1e',
-            input: '#3c3c3c',
-            hover: '#2a2d2e',
-            border: '#3e3e42',
-            text: '#cccccc',
-            blue: '#0e639c'
+            bg: 'var(--app-bg)',
+            sidebar: 'var(--sidebar-bg)',
+            activityBar: 'var(--activitybar-bg)',
+            statusBar: 'var(--statusbar-bg)',
+            panel: 'var(--panel-bg)',
+            input: 'var(--input-bg)',
+            hover: 'var(--hover-bg)',
+            border: 'var(--border-color)',
+            'border-secondary': 'var(--border-secondary)',
+            text: 'var(--text-primary)',
+            'text-heading': 'var(--text-heading)',
+            'text-secondary': 'var(--text-secondary)',
+            'text-muted': 'var(--text-muted)',
+            blue: 'var(--accent)',
+            'accent-fg': 'var(--accent-fg)',
+            selection: 'var(--selection-bg)',
+            focusBorder: 'var(--focus-border)',
+            'sidebar-fg': 'var(--sidebar-fg)',
+            'activitybar-fg': 'var(--activitybar-fg)',
+            'statusbar-fg': 'var(--statusbar-fg)',
+            'list-hover': 'var(--hover-bg)',
         }
       },
       fontFamily: {

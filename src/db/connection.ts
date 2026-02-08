@@ -1,5 +1,6 @@
 import { type DBSchema, type IDBPDatabase, openDB } from 'idb';
 import { DB_NAME, DB_VERSION } from './config';
+import type { ThemeRecord } from '../theme/types';
 
 export interface BookmarkRecord {
   id: string;
@@ -61,6 +62,10 @@ export interface VsDeskDB extends DBSchema {
       userId: string;
     };
   };
+  themes: {
+    key: string;
+    value: ThemeRecord;
+  };
 }
 
 let dbPromise: Promise<IDBPDatabase<VsDeskDB>> | null = null;
@@ -98,6 +103,13 @@ export function getDB(): Promise<IDBPDatabase<VsDeskDB>> {
           const bookmarkStore = transaction.objectStore('bookmarks');
           if (!bookmarkStore.indexNames.contains('workspaceId')) {
             bookmarkStore.createIndex('workspaceId', 'workspaceId');
+          }
+        }
+
+        // v3: Themes
+        if (oldVersion < 3) {
+          if (!db.objectStoreNames.contains('themes')) {
+            db.createObjectStore('themes', { keyPath: 'id' });
           }
         }
       },

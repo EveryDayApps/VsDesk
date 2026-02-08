@@ -1,0 +1,61 @@
+{
+  "name": "Monokai",
+  "type": "dark",
+  "colors": {
+    "editor.background": "#272822",
+    "editor.foreground": "#f8f8f2",
+    "foreground": "#f8f8f2",
+    "descriptionForeground": "#a6a6a6",
+    "disabledForeground": "#75715e",
+    "focusBorder": "#75715e",
+
+    "sideBar.background": "#1e1f1c",
+    "sideBar.foreground": "#f8f8f2",
+    "sideBar.border": "#414339",
+    "activityBar.background": "#1e1f1c",
+    "activityBar.foreground": "#f8f8f2",
+    "panel.background": "#272822",
+    "panel.border": "#414339",
+    "statusBar.background": "#414339",
+    "statusBar.foreground": "#f8f8f2",
+    "titleBar.activeBackground": "#1e1f1c",
+    "titleBar.activeForeground": "#f8f8f2",
+
+    "editorWidget.background": "#1e1f1c",
+    "widget.border": "#414339",
+
+    "input.background": "#414339",
+    "input.foreground": "#f8f8f2",
+    "input.border": "#555651",
+    "inputOption.activeBorder": "#a6e22e",
+
+    "button.background": "#75715e",
+    "button.foreground": "#f8f8f2",
+    "button.hoverBackground": "#8a856a",
+    "button.secondaryBackground": "#414339",
+    "button.secondaryForeground": "#f8f8f2",
+    "button.secondaryHoverBackground": "#555651",
+
+    "checkbox.background": "#414339",
+    "checkbox.border": "#555651",
+    "checkbox.foreground": "#f8f8f2",
+
+    "badge.background": "#75715e",
+    "badge.foreground": "#f8f8f2",
+
+    "list.hoverBackground": "#414339",
+    "list.activeSelectionBackground": "#75715e",
+    "list.activeSelectionForeground": "#f8f8f2",
+    "list.inactiveSelectionBackground": "#414339",
+
+    "tab.activeBackground": "#272822",
+    "tab.activeForeground": "#f8f8f2",
+    "tab.inactiveBackground": "#1e1f1c",
+    "tab.inactiveForeground": "#a6a6a6",
+
+    "scrollbar.shadow": "#000000",
+    "scrollbarSlider.background": "rgba(121, 121, 121, 0.4)",
+    "scrollbarSlider.hoverBackground": "rgba(100, 100, 100, 0.7)",
+    "scrollbarSlider.activeBackground": "rgba(191, 191, 191, 0.4)"
+  }
+}

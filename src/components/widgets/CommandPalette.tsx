@@ -1,19 +1,22 @@
 import {
   Github,
   Monitor,
-  Moon,
+  Palette,
   Search,
   Settings,
   Trash2
 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
+import type { Theme } from '../../theme/types';
 import { cn } from '../../utils/cn';
 import { Overlay } from '../ui/Overlay';
 
 interface CommandPaletteProps {
   isOpen: boolean;
   onClose: () => void;
-  toggleTheme: () => void;
+  activeTheme: Theme | null;
+  themes: Theme[];
+  onSetTheme: (id: string) => Promise<void>;
   onOpenSettings: () => void;
 }
 
@@ -26,20 +29,21 @@ interface CommandItem {
   shortcut?: string;
 }
 
-export function CommandPalette({ isOpen, onClose, toggleTheme, onOpenSettings }: CommandPaletteProps) {
+export function CommandPalette({ isOpen, onClose, activeTheme, themes, onSetTheme, onOpenSettings }: CommandPaletteProps) {
   const [query, setQuery] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
   const inputRef = useRef<any>(null);
 
+  const themeCommands: CommandItem[] = themes.map((theme) => ({
+    id: `theme-${theme.id}`,
+    label: `Color Theme: ${theme.name}`,
+    subLabel: activeTheme?.id === theme.id ? 'Active' : `${theme.base} theme${theme.type === 'imported' ? ' (imported)' : ''}`,
+    icon: Palette,
+    action: () => onSetTheme(theme.id),
+  }));
+
   const commands: CommandItem[] = [
-    {
-      id: 'theme-toggle',
-      label: 'Toggle Theme',
-      subLabel: 'Switch between light and dark mode',
-      icon: Moon, // Or Sun based on current theme, simplified
-      action: toggleTheme,
-      shortcut: '⌘T',
-    },
+    ...themeCommands,
     {
       id: 'new-file',
       label: 'New File',
@@ -106,7 +110,7 @@ export function CommandPalette({ isOpen, onClose, toggleTheme, onOpenSettings }:
         e.preventDefault();
         if (filteredCommands[selectedIndex]) {
           filteredCommands[selectedIndex].action();
-          onClose(); // Close after action
+          onClose();
         }
       } else if (e.key === 'Escape') {
         onClose();
@@ -122,11 +126,11 @@ export function CommandPalette({ isOpen, onClose, toggleTheme, onOpenSettings }:
   return (
     <Overlay onClose={onClose} className="flex items-start justify-center pt-[15vh]">
       <div
-        className="w-full max-w-2xl bg-vscode-sidebar border border-vscode-focusBorder shadow-2xl rounded-lg overflow-hidden flex flex-col animate-in fade-in zoom-in-95 duration-200"
+        className="w-full max-w-2xl bg-[var(--sidebar-bg)] border border-[var(--focus-border)] shadow-2xl rounded-lg overflow-hidden flex flex-col animate-in fade-in zoom-in-95 duration-200"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center px-4 py-3 border-b border-vscode-border bg-vscode-input">
-          <Search className="w-5 h-5 text-gray-400 mr-3" />
+        <div className="flex items-center px-4 py-3 border-b border-[var(--border-color)] bg-[var(--input-bg)]">
+          <Search className="w-5 h-5 text-[var(--text-muted)] mr-3" />
           <vscode-textfield
             ref={inputRef}
             className="flex-1"
@@ -139,10 +143,10 @@ export function CommandPalette({ isOpen, onClose, toggleTheme, onOpenSettings }:
           />
           <vscode-badge className="ml-2">ESC</vscode-badge>
         </div>
-        
+
         <vscode-scrollable className="max-h-[60vh] py-2">
           {filteredCommands.length === 0 ? (
-             <div className="px-4 py-8 text-center text-gray-500">
+             <div className="px-4 py-8 text-center text-[var(--text-muted)]">
                No commands found.
              </div>
           ) : (
@@ -152,8 +156,8 @@ export function CommandPalette({ isOpen, onClose, toggleTheme, onOpenSettings }:
                 className={cn(
                   "flex items-center justify-between px-4 py-3 cursor-pointer transition-colors group",
                   index === selectedIndex
-                    ? "bg-vscode-blue/20 border-l-2 border-vscode-blue"
-                    : "hover:bg-vscode-list-hover border-l-2 border-transparent"
+                    ? "bg-[var(--selection-bg)] border-l-2 border-[var(--accent)]"
+                    : "hover:bg-[var(--hover-bg)] border-l-2 border-transparent"
                 )}
                 onClick={() => {
                   command.action();
@@ -164,17 +168,17 @@ export function CommandPalette({ isOpen, onClose, toggleTheme, onOpenSettings }:
                 <div className="flex items-start">
                   <command.icon className={cn(
                     "w-5 h-5 mt-0.5 mr-3 transition-colors",
-                    index === selectedIndex ? "text-white" : "text-gray-400"
+                    index === selectedIndex ? "text-[var(--selection-fg)]" : "text-[var(--text-muted)]"
                   )} />
                   <div>
                     <div className={cn(
                       "text-sm font-medium transition-colors",
-                      index === selectedIndex ? "text-white" : "text-gray-300"
+                      index === selectedIndex ? "text-[var(--selection-fg)]" : "text-[var(--text-heading)]"
                     )}>
                       {command.label}
                     </div>
                     {command.subLabel && (
-                       <div className="text-xs text-gray-500 mt-0.5">
+                       <div className="text-xs text-[var(--text-muted)] mt-0.5">
                          {command.subLabel}
                        </div>
                     )}
@@ -187,8 +191,8 @@ export function CommandPalette({ isOpen, onClose, toggleTheme, onOpenSettings }:
             ))
           )}
         </vscode-scrollable>
-        
-        <div className="bg-vscode-statusBar px-4 py-1.5 text-xs text-vscode-text flex justify-between border-t border-vscode-border">
+
+        <div className="bg-[var(--statusbar-bg)] text-[var(--statusbar-fg)] px-4 py-1.5 text-xs flex justify-between border-t border-[var(--border-color)]">
             <span>ProTip: Use arrow keys to navigate</span>
             <span>v1.0.0</span>
         </div>

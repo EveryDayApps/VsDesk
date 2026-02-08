@@ -9,7 +9,7 @@ import { useWorkspace } from './context/WorkspaceContext';
 import { useTheme } from './hooks/useTheme';
 
 function App() {
-  const { toggleTheme } = useTheme();
+  const { activeTheme, themes, setTheme } = useTheme();
   const { settings } = useSettings();
   const { activeWorkspace, activeWorkspaceId, setActiveWorkspace } = useWorkspace();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -44,7 +44,7 @@ function App() {
   const showSidebar = settings.showSidebar && isSidebarOpen && activeWorkspace.sidebarConfig?.enabled;
 
   return (
-    <div className="flex flex-col h-screen overflow-hidden bg-vscode-bg text-white font-sans selection:bg-vscode-selection">
+    <div className="flex flex-col h-screen overflow-hidden bg-vscode-bg text-[var(--text-heading)] font-sans">
       {settings.showTitleBar && <TitleBar onSearchClick={() => setShowCommandPalette(true)} />}
 
       <div className="flex flex-1 overflow-hidden relative">
@@ -70,7 +70,9 @@ function App() {
         <CommandPalette
           isOpen={showCommandPalette}
           onClose={() => setShowCommandPalette(false)}
-          toggleTheme={toggleTheme}
+          activeTheme={activeTheme}
+          themes={themes}
+          onSetTheme={setTheme}
           onOpenSettings={() => setActiveWorkspace('settings')}
         />
       )}
